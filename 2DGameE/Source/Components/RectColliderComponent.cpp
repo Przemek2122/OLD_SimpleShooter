@@ -12,22 +12,27 @@ RectColliderComponent::RectColliderComponent(std::string colliderTag) : Collider
 	colliderType = COLLIDER_RECT;
 }
 
-SDL_Rect RectColliderComponent::getRect()
+// To delete
+SDL_Rect inline RectColliderComponent::getRect()
 {
 	SDL_Rect newRect = transform->Rect;
 
-	newRect.x += transform->Location.X;
-	newRect.y += transform->Location.Y;
+	newRect.x += transform->Location.X + entity->getManager().game->camera->getComponent<CameraManagerComponent>().getCameraPosition().X;
+	newRect.y += transform->Location.Y + entity->getManager().game->camera->getComponent<CameraManagerComponent>().getCameraPosition().Y;
 
 	return newRect;
 }
 
+Vector2D<int> inline RectColliderComponent::getCenter()
+{
+	return EMath::GetRectCenter(getRect()) + entity->getManager().game->camera->getComponent<CameraManagerComponent>().getCameraPosition();
+}
+
 void RectColliderComponent::customUpdate()
 {
-	Vector2D<int> * vertices = EMath::RotateRect(getRect(), EMath::GetRectCenter(getRect()), EMath::DegreesToRadians(45));
-
-	//Util::Debug(vertices[0]);
-	//Util::Debug(vertices[0] + transform->Location);
+	//Vector2D<> camLoc = entity->getManager().game->camera->getComponent<CameraManagerComponent>().getCameraPosition();
+	//Vector2D<int> position = Vector2D<int>(ROUND_INT(transform->Location.X + camLoc.X), ROUND_INT(transform->Location.Y + camLoc.Y));
+	Vector2D<int> * vertices = EMath::RotateRect(getRect(), getCenter(), test += 0.01);
 
 	vertex_TL = vertices[0];
 	vertex_TR = vertices[1];
@@ -50,9 +55,12 @@ void RectColliderComponent::customRender()
 		SDL_RenderDrawLine(Game::renderer, vertex_BR.X, vertex_BR.Y, vertex_BL.X, vertex_BL.Y);
 		SDL_RenderDrawLine(Game::renderer, vertex_BL.X, vertex_BL.Y, vertex_TL.X, vertex_TL.Y);
 
-		// Center of collider
-		Vector2D<int> center = EMath::GetRectCenter(getRect()) + camLoc;
+		// Get center of collider
+		Vector2D<int> center = getCenter();
+
+		// Debug circle
 		SDL_RenderDrawPoint(Game::renderer, center.X, center.Y);
+		// Debug circle - Bigger
 		Shapes::drawCircle(Game::renderer, center.X, center.Y, 2);
 	}
 #endif

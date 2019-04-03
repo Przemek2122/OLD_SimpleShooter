@@ -36,23 +36,6 @@ double EMath::Get2DAngleOfPointRadians(Vector2D<> a, Vector2D<> b)
 	return atan2(a.Y - b.Y, a.X - b.X);
 }
 
-void EMath::RotatePointArroundPoint(Vector2D<int> & pivot, float & angle, Vector2D<int>& point){
-	float s = sin(angle);
-	float c = cos(angle);
-
-	// translate point back to origin:
-	point.X -= pivot.X;
-	point.Y -= pivot.Y;
-
-	// rotate point
-	float xnew = point.X * c - point.Y * s;
-	float ynew = point.X * s + point.Y * c;
-
-	// translate point back:
-	point.X = xnew + pivot.Y;
-	point.Y = ynew + pivot.Y;
-}
-
 Vector2D<int> * EMath::RotateRect(SDL_Rect rect, Vector2D<int> center, float angle)
 {
 	std::vector<Vector2D<int>> points;
@@ -78,7 +61,7 @@ Vector2D<int> * EMath::RotateRect(SDL_Rect rect, Vector2D<int> center, float ang
 	return vertices;
 }
 
-void EMath::RotatePoints(std::vector<Vector2D<int>> & points, Vector2D<int> & center, float & angle)
+void inline EMath::RotatePoints(std::vector<Vector2D<int>> & points, Vector2D<int> & center, float & angle)
 {
 	for (int i = 0; i < points.size(); i++)
 	{
@@ -86,8 +69,26 @@ void EMath::RotatePoints(std::vector<Vector2D<int>> & points, Vector2D<int> & ce
 	}
 }
 
+void inline EMath::RotatePointArroundPoint(Vector2D<int> &pivot, float &angle, Vector2D<int> &point)
+{
+	float s = sin(angle);
+	float c = cos(angle);
+
+	// translate point back to origin:
+	point.X -= pivot.X;
+	point.Y -= pivot.Y;
+
+	// rotate point
+	float xnew = point.X * c - point.Y * s;
+	float ynew = point.X * s + point.Y * c;
+
+	// translate point back:
+	point.X = xnew + pivot.X;
+	point.Y = ynew + pivot.Y;
+}
+
 /** Rounds x to be between 0 and 360 eg: 720 will be 360, 480 will be 120 etc.  */
-int EMath::RoundAngleInt(int x)
+int inline EMath::RoundAngleInt(int x)
 {
 	while (x > 360)
 		x -= 360;
@@ -99,7 +100,7 @@ int EMath::RoundAngleInt(int x)
 }
 
 /** Rounds x to be between 0 and 360 eg: 720 will be 360, 480 will be 120 etc.  */
-float EMath::RoundAngleFloat(int x)
+float inline EMath::RoundAngleFloat(int x)
 {
 	while (x > 360)
 		x -= 360;
@@ -116,6 +117,8 @@ float EMath::Distance2D(Vector2D<> a, Vector2D<> b)
 
 	int distancex = (b.X - a.X) * (b.X - a.X);
 	int distancey = (b.Y - a.Y) * (b.Y - a.Y);
+
+	// Then just square root
 
 	return (float)sqrt(distancex + distancey);
 }

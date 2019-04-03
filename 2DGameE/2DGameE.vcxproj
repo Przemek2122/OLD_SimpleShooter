@@ -42,6 +42,8 @@
     <ClCompile Include="Source\main.cpp" />
     <ClCompile Include="Source\Map.cpp" />
     <ClCompile Include="Source\Mouse.cpp" />
+    <ClCompile Include="Source\Socket.cpp" />
+    <ClCompile Include="Source\Sockets.cpp" />
     <ClCompile Include="Source\StaticCollision.cpp" />
     <ClCompile Include="Source\TextureManager.cpp" />
     <ClCompile Include="Source\UI\ButtonWidget.cpp" />
@@ -79,6 +81,8 @@
     <ClInclude Include="Source\Keyboard.h" />
     <ClInclude Include="Source\Map.h" />
     <ClInclude Include="Source\Mouse.h" />
+    <ClInclude Include="Source\Socket.h" />
+    <ClInclude Include="Source\Sockets.h" />
     <ClInclude Include="Source\StaticCollision.h" />
     <ClInclude Include="Source\UI\ButtonWidget.h" />
     <ClInclude Include="Source\UI\TextWidget.h" />
@@ -140,19 +144,19 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-    <IncludePath>C:\Users\Przemek\source\repos\SimpleShooter\2DGameE\SDL;C:\Users\Przemek\source\repos\2DGameE\2DGameE\Source\Components;C:\Users\Przemek\source\repos\SimpleShooter\2DGameE\Source;C:\Users\Przemek\source\repos\2DGameE\2DGameE\Source;C:\Users\Przemek\source\repos\2DGameE\2DGameE\SDL;$(IncludePath)</IncludePath>
+    <IncludePath>D:\SimpleShooter\2DGameE\SDL;C:\Users\Przemek\source\repos\2DGameE\2DGameE\Source\Components;C:\Users\Przemek\source\repos\SimpleShooter\2DGameE\Source;C:\Users\Przemek\source\repos\2DGameE\2DGameE\Source;C:\Users\Przemek\source\repos\2DGameE\2DGameE\SDL;$(IncludePath)</IncludePath>
     <LibraryPath>C:\Users\Przemek\source\repos\SimpleShooter\2DGameE\lib\x86;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
-    <IncludePath>C:\Users\Przemek\source\repos\SimpleShooter\2DGameE\SDL;C:\Users\Przemek\source\repos\2DGameE\2DGameE\Source\Components;C:\Users\Przemek\source\repos\SimpleShooter\2DGameE\Source;C:\Users\Przemek\source\repos\2DGameE\2DGameE\Source;C:\Users\Przemek\source\repos\2DGameE\2DGameE\SDL;$(IncludePath)</IncludePath>
+    <IncludePath>D:\SimpleShooter\2DGameE\SDL;C:\Users\Przemek\source\repos\2DGameE\2DGameE\Source\Components;C:\Users\Przemek\source\repos\SimpleShooter\2DGameE\Source;C:\Users\Przemek\source\repos\2DGameE\2DGameE\Source;C:\Users\Przemek\source\repos\2DGameE\2DGameE\SDL;$(IncludePath)</IncludePath>
     <LibraryPath>C:\Users\Przemek\source\repos\SimpleShooter\2DGameE\lib\x86;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <IncludePath>C:\Users\Przemek\source\repos\SimpleShooter\2DGameE\SDL;C:\Users\Przemek\source\repos\2DGameE\2DGameE\Source\Components;C:\Users\Przemek\source\repos\SimpleShooter\2DGameE\Source;C:\Users\Przemek\source\repos\2DGameE\2DGameE\SDL;$(IncludePath)</IncludePath>
+    <IncludePath>D:\SimpleShooter\2DGameE\SDL;C:\Users\Przemek\source\repos\2DGameE\2DGameE\Source\Components;C:\Users\Przemek\source\repos\SimpleShooter\2DGameE\Source;C:\Users\Przemek\source\repos\2DGameE\2DGameE\SDL;$(IncludePath)</IncludePath>
     <LibraryPath>C:\Users\Przemek\source\repos\SimpleShooter\2DGameE\lib\x64;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-    <IncludePath>C:\Users\Przemek\source\repos\SimpleShooter\2DGameE\SDL;C:\Users\Przemek\source\repos\2DGameE\2DGameE\Source\Components;C:\Users\Przemek\source\repos\SimpleShooter\2DGameE\Source;C:\Users\Przemek\source\repos\2DGameE\2DGameE\SDL;$(IncludePath)</IncludePath>
+    <IncludePath>D:\SimpleShooter\2DGameE\SDL;C:\Users\Przemek\source\repos\2DGameE\2DGameE\Source\Components;C:\Users\Przemek\source\repos\SimpleShooter\2DGameE\Source;C:\Users\Przemek\source\repos\2DGameE\2DGameE\SDL;$(IncludePath)</IncludePath>
     <LibraryPath>C:\Users\Przemek\source\repos\SimpleShooter\2DGameE\lib\x64;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">

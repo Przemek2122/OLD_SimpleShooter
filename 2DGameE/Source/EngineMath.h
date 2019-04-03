@@ -24,15 +24,15 @@ namespace EMath
 	double Get2DAngleOfPointRadians(Vector2D<> a, Vector2D<> b);
 
 	/* Expects radians not degree */
-	void RotatePointArroundPoint(Vector2D<int> & pivot, float & angle, Vector2D<int>& point);
+	void inline RotatePointArroundPoint(Vector2D<int> & pivot, float & angle, Vector2D<int>& point);
 
 	Vector2D<int>* RotateRect(SDL_Rect rect, Vector2D<int> center, float angle);
 
-	void RotatePoints(std::vector<Vector2D<int>> & points, Vector2D<int> & center, float & angle);
+	void inline RotatePoints(std::vector<Vector2D<int>> & points, Vector2D<int> & center, float & angle);
 
-	int RoundAngleInt(int x);
+	int inline RoundAngleInt(int x);
 
-	float RoundAngleFloat(int x);
+	float inline RoundAngleFloat(int x);
 
 	float Distance2D(Vector2D<> a, Vector2D<> b);
 

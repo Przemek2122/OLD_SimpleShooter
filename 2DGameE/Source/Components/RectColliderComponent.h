@@ -19,12 +19,15 @@ public:
 	bool drawDebugCollider = true;
 #endif
 
-	SDL_Rect getRect();
+	SDL_Rect inline getRect();
+
+	Vector2D<int> getCenter();
 
 	void customUpdate() override;
 	void customRender() override;
 
 private:
 	bool moving = true;
+	float test = 0;
 
 };

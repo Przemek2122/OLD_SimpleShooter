@@ -5,7 +5,8 @@ Game *game = nullptr;
 
 bool FPSLimitEnabled = true;
 
-int main(/*int argc, char * argv[]*/){
+int main(/*int argc, char * argv[]*/)
+{
 	// FPS limit
 	const int FPS = 60;
 	const float frameDelay = 1000 / FPS;
@@ -20,17 +21,20 @@ int main(/*int argc, char * argv[]*/){
 	game = new Game();
 	game->init("Game", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 800, 600, false);
 
-	while (game->isRunning()) {
+	while (game->isRunning()) 
+	{
 		frameStart = SDL_GetTicks();
 
 		game->handleEvents();
 		game->update();
 		game->render();
 
-		if (FPSLimitEnabled == true) {
+		if (FPSLimitEnabled == true)
+		{
 			frameTime = SDL_GetTicks() - frameStart;
 
-			if (frameDelay > frameTime) {
+			if (frameDelay > frameTime)
+			{
 				SDL_Delay(frameDelay - frameTime);
 			}
 		}
