@@ -6,6 +6,8 @@
 #include "SDL_image.h"
 #include "SDL_ttf.h"
 
+
+class SocketsManager;
 class Manager;
 class Entity;
 class AssetsManager;
@@ -30,14 +32,19 @@ public:
 	void setDeltaTime(double time);
 	double getDeltaTime();
 
+
 	static SDL_Window * window;
 	static SDL_Renderer *renderer;
 	static SDL_Event event;
 	static AssetsManager* assets;
+
+	SocketsManager * sockets;
 	Manager * ECSmanager;
 	UIManager * UiManager;
 	AudioManager * audioManager;
 	Map* map;
+
+	bool server;
 
 	Entity * camera;
 	Entity * player;
@@ -49,4 +56,5 @@ private:
 
 	int cnt = 0;
 	bool running;
+
 };

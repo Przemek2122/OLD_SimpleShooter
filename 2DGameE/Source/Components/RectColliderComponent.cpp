@@ -15,24 +15,27 @@ RectColliderComponent::RectColliderComponent(std::string colliderTag) : Collider
 // To delete
 SDL_Rect inline RectColliderComponent::getRect()
 {
-	SDL_Rect newRect = transform->Rect;
+	// uncoment if you don't set x and y by transform->Location + cam loc (And comment rest)
+	//SDL_Rect newRect = transform->Rect;
 
-	newRect.x += transform->Location.X + entity->getManager().game->camera->getComponent<CameraManagerComponent>().getCameraPosition().X;
-	newRect.y += transform->Location.Y + entity->getManager().game->camera->getComponent<CameraManagerComponent>().getCameraPosition().Y;
+	SDL_Rect newRect;
+	newRect.w = transform->Rect.w;
+	newRect.h = transform->Rect.h;
+
+	newRect.x = transform->Location.X + entity->getManager().game->camera->getComponent<CameraManagerComponent>().getCameraPosition().X;
+	newRect.y = transform->Location.Y + entity->getManager().game->camera->getComponent<CameraManagerComponent>().getCameraPosition().Y;
 
 	return newRect;
 }
 
 Vector2D<int> inline RectColliderComponent::getCenter()
 {
-	return EMath::GetRectCenter(getRect()) + entity->getManager().game->camera->getComponent<CameraManagerComponent>().getCameraPosition();
+	return EMath::GetRectCenter(getRect());
 }
 
 void RectColliderComponent::customUpdate()
 {
-	//Vector2D<> camLoc = entity->getManager().game->camera->getComponent<CameraManagerComponent>().getCameraPosition();
-	//Vector2D<int> position = Vector2D<int>(ROUND_INT(transform->Location.X + camLoc.X), ROUND_INT(transform->Location.Y + camLoc.Y));
-	Vector2D<int> * vertices = EMath::RotateRect(getRect(), getCenter(), test += 0.01);
+	Vector2D<int> * vertices = EMath::RotateRect(getRect(), getCenter(), 0);
 
 	vertex_TL = vertices[0];
 	vertex_TR = vertices[1];

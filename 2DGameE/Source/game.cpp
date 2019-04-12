@@ -1,4 +1,7 @@
 #include "game.h"
+#include "ErrorCodes.h"
+
+#include "Sockets/Sockets.h"
 
 #include "Components/CameraManager.h"
 
@@ -38,7 +41,10 @@ AssetsManager* Game::assets = new AssetsManager(&manager);
 SDL_Window* Game::window = nullptr;
 
 
-Game::Game(){}
+Game::Game()
+{
+	server = false;
+}
 Game::~Game(){}
 
 void Game::init(const char* title, int xpos, int ypos, int width, int height, bool fullscreen)
@@ -52,7 +58,8 @@ void Game::init(const char* title, int xpos, int ypos, int width, int height, bo
 	}
 
 	// Initialize SDL
-	if (SDL_Init(SDL_INIT_EVERYTHING) == 0){
+	if (SDL_Init(SDL_INIT_EVERYTHING) == 0)
+	{
 		Util::Info("Subsystem Initialised!");
 
 		window = SDL_CreateWindow(title, xpos, ypos, width, height, flags);
@@ -62,7 +69,7 @@ void Game::init(const char* title, int xpos, int ypos, int width, int height, bo
 		} 
 		else 
 		{
-			Util::Error("Window createing: " + (std::string)SDL_GetError());
+			Util::Error("Window creating: " + (std::string)SDL_GetError());
 			exit(2);
 		}
 
@@ -107,19 +114,43 @@ void Game::init(const char* title, int xpos, int ypos, int width, int height, bo
 		exit(7);
 	}
 
-	//Initialize SDL_mixer
+	// Initialize sdl mixer
 	if (Mix_OpenAudio(44100, MIX_DEFAULT_FORMAT, 2, 2048) < 0)
 	{
 		Util::Error("SDL_mixer: %s\n" + (std::string)Mix_GetError() + (std::string)SDL_GetError());
 		exit(8);
 	}
+
+	// Initialize sdl net
+	if (SDLNet_Init() == -1)
+	{
+		Util::Error("SDLNet_Init: %s\n" + (std::string)SDLNet_GetError() + (std::string)SDL_GetError());
+		exit(9);
+	}
 	
 	SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "2");
 
+	// Entity - component system manager
 	manager.game = this;
+
+	// Audio 
 	audioManager = new AudioManager;
+
+	// UI
 	UiManager = new UIManager(this);
+
+	// Map (will generate anything too...)
 	map = new Map(this);
+
+	// Sockets
+	sockets = new SocketsManager(this);
+	if (server)
+		sockets->Listen(21000);
+	else
+		sockets->Connect(
+			"localhost",
+			21000
+		);
 
 	// Camera
 	cameraManager.addComponent<CameraManagerComponent>();
@@ -143,9 +174,30 @@ void Game::init(const char* title, int xpos, int ypos, int width, int height, bo
 	assets->addTexture("ui_button_default", "assets/ui/button_default.png");
 	assets->addFont("OpenSans_16", "font/OpenSans-Regular.ttf", 16);
 	SDL_Color color = { 255, 255, 255, 255 };
-	UiManager->addWidget<TextWidget>("FPS", UIUtil::getScreenPercentW(97), 0, "FPS", "OpenSans_16", color);
-	UiManager->addWidget<TextWidget>("PlayerX", UIUtil::getScreenPercentW(90), UIUtil::getScreenPercentH(96), "0", "OpenSans_16", color);
-	UiManager->addWidget<TextWidget>("PlayerY", UIUtil::getScreenPercentW(95), UIUtil::getScreenPercentH(96), "0", "OpenSans_16", color);
+	UiManager->addWidget<TextWidget>(
+		"FPS",								// Text name
+		UIUtil::getScreenPercentW(97),		// Width
+		0,									// Height
+		"FPS",								// Default value
+		"OpenSans_16",						// Font
+		color								// Color
+	);
+	UiManager->addWidget<TextWidget>(
+		"PlayerX",							// Text name
+		UIUtil::getScreenPercentW(90),		// Width
+		UIUtil::getScreenPercentH(96),		// Height
+		"0", 								// Default value
+		"OpenSans_16", 						// Font
+		color 								// Color
+	);
+	UiManager->addWidget<TextWidget>(
+		"PlayerY",							// Text name
+		UIUtil::getScreenPercentW(95),		// Width
+		UIUtil::getScreenPercentH(96),		// Height
+		"0",								// Default value
+		"OpenSans_16",  					// Font
+		color 								// Color
+	);
 	//UiManager->addWidget<ButtonWidget>("testbutton", 100, 100, 200, 50);
 }
 
@@ -199,8 +251,8 @@ void Game::render()
 
 void Game::clean()
 {
-	//SDL_DestroyWindow(window);
-	//SDL_DestroyRenderer(renderer); // Causes infinite loop / freez when destroying ?!
+	SDL_DestroyWindow(window);
+	//SDL_DestroyRenderer(renderer); // Causes infinite loop / freez when destroying ?! @TODO FIX
 	TTF_Quit();
 	Mix_CloseAudio();
 	SDL_Quit();

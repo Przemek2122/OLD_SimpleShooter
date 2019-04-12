@@ -3,12 +3,14 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
 VisualStudioVersion = 15.0.27130.2010
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "2DGameE", "2DGameE\2DGameE.vcxproj", "{872C3E71-8ADB-4DB4-BAB0-C4F2887A4DBA}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "SimpleShooter", "2DGameE\2DGameE.vcxproj", "{872C3E71-8ADB-4DB4-BAB0-C4F2887A4DBA}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
 		Debug|x86 = Debug|x86
+		Dedicated|x64 = Dedicated|x64
+		Dedicated|x86 = Dedicated|x86
 		Release|x64 = Release|x64
 		Release|x86 = Release|x86
 	EndGlobalSection
@@ -17,6 +19,10 @@ Global
 		{872C3E71-8ADB-4DB4-BAB0-C4F2887A4DBA}.Debug|x64.Build.0 = Debug|x64
 		{872C3E71-8ADB-4DB4-BAB0-C4F2887A4DBA}.Debug|x86.ActiveCfg = Debug|Win32
 		{872C3E71-8ADB-4DB4-BAB0-C4F2887A4DBA}.Debug|x86.Build.0 = Debug|Win32
+		{872C3E71-8ADB-4DB4-BAB0-C4F2887A4DBA}.Dedicated|x64.ActiveCfg = Dedicated|x64
+		{872C3E71-8ADB-4DB4-BAB0-C4F2887A4DBA}.Dedicated|x64.Build.0 = Dedicated|x64
+		{872C3E71-8ADB-4DB4-BAB0-C4F2887A4DBA}.Dedicated|x86.ActiveCfg = Dedicated|Win32
+		{872C3E71-8ADB-4DB4-BAB0-C4F2887A4DBA}.Dedicated|x86.Build.0 = Dedicated|Win32
 		{872C3E71-8ADB-4DB4-BAB0-C4F2887A4DBA}.Release|x64.ActiveCfg = Release|x64
 		{872C3E71-8ADB-4DB4-BAB0-C4F2887A4DBA}.Release|x64.Build.0 = Release|x64
 		{872C3E71-8ADB-4DB4-BAB0-C4F2887A4DBA}.Release|x86.ActiveCfg = Release|Win32

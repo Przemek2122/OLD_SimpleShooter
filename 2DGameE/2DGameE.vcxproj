@@ -5,6 +5,14 @@
       <Configuration>Debug</Configuration>
       <Platform>Win32</Platform>
     </ProjectConfiguration>
+    <ProjectConfiguration Include="Dedicated|Win32">
+      <Configuration>Dedicated</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Dedicated|x64">
+      <Configuration>Dedicated</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
     <ProjectConfiguration Include="Release|Win32">
       <Configuration>Release</Configuration>
       <Platform>Win32</Platform>
@@ -42,8 +50,14 @@
     <ClCompile Include="Source\main.cpp" />
     <ClCompile Include="Source\Map.cpp" />
     <ClCompile Include="Source\Mouse.cpp" />
-    <ClCompile Include="Source\Socket.cpp" />
-    <ClCompile Include="Source\Sockets.cpp" />
+    <ClCompile Include="Source\Sockets\Socket.cpp" />
+    <ClCompile Include="Source\Sockets\SocketClient.cpp" />
+    <ClCompile Include="Source\Sockets\SocketClientTCP.cpp" />
+    <ClCompile Include="Source\Sockets\SocketClientUDP.cpp" />
+    <ClCompile Include="Source\Sockets\Sockets.cpp" />
+    <ClCompile Include="Source\Sockets\SocketServer.cpp" />
+    <ClCompile Include="Source\Sockets\SocketServerTCP.cpp" />
+    <ClCompile Include="Source\Sockets\SocketServerUDP.cpp" />
     <ClCompile Include="Source\StaticCollision.cpp" />
     <ClCompile Include="Source\TextureManager.cpp" />
     <ClCompile Include="Source\UI\ButtonWidget.cpp" />
@@ -75,14 +89,21 @@
     <ClInclude Include="Source\Components\WeaponComponent.h" />
     <ClInclude Include="Source\DynamicCollision.h" />
     <ClInclude Include="Source\EngineMath.h" />
+    <ClInclude Include="Source\ErrorCodes.h" />
     <ClInclude Include="Source\EventsHandler.h" />
     <ClInclude Include="Source\CustomShapes.h" />
     <ClInclude Include="Source\game.h" />
     <ClInclude Include="Source\Keyboard.h" />
     <ClInclude Include="Source\Map.h" />
     <ClInclude Include="Source\Mouse.h" />
-    <ClInclude Include="Source\Socket.h" />
-    <ClInclude Include="Source\Sockets.h" />
+    <ClInclude Include="Source\Sockets\Socket.h" />
+    <ClInclude Include="Source\Sockets\SocketClient.h" />
+    <ClInclude Include="Source\Sockets\SocketClientTCP.h" />
+    <ClInclude Include="Source\Sockets\SocketClientUDP.h" />
+    <ClInclude Include="Source\Sockets\Sockets.h" />
+    <ClInclude Include="Source\Sockets\SocketServer.h" />
+    <ClInclude Include="Source\Sockets\SocketServerTCP.h" />
+    <ClInclude Include="Source\Sockets\SocketServerUDP.h" />
     <ClInclude Include="Source\StaticCollision.h" />
     <ClInclude Include="Source\UI\ButtonWidget.h" />
     <ClInclude Include="Source\UI\TextWidget.h" />
@@ -125,6 +146,12 @@
     <WholeProgramOptimization>true</WholeProgramOptimization>
     <CharacterSet>MultiByte</CharacterSet>
   </PropertyGroup>
+  <PropertyGroup Label="Configuration" Condition="'$(Configuration)|$(Platform)'=='Dedicated|Win32'">
+    <PlatformToolset>v141</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Label="Configuration" Condition="'$(Configuration)|$(Platform)'=='Dedicated|x64'">
+    <PlatformToolset>v141</PlatformToolset>
+  </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
   <ImportGroup Label="ExtensionSettings">
   </ImportGroup>
@@ -144,20 +171,28 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-    <IncludePath>D:\SimpleShooter\2DGameE\SDL;C:\Users\Przemek\source\repos\2DGameE\2DGameE\Source\Components;C:\Users\Przemek\source\repos\SimpleShooter\2DGameE\Source;C:\Users\Przemek\source\repos\2DGameE\2DGameE\Source;C:\Users\Przemek\source\repos\2DGameE\2DGameE\SDL;$(IncludePath)</IncludePath>
-    <LibraryPath>C:\Users\Przemek\source\repos\SimpleShooter\2DGameE\lib\x86;$(LibraryPath)</LibraryPath>
+    <IncludePath>$(SolutionDir)\2DGameE\Source;$(SolutionDir)\2DGameE\SDL;$(IncludePath)</IncludePath>
+    <LibraryPath>$(SolutionDir)\2DGameE\lib\x86;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
-    <IncludePath>D:\SimpleShooter\2DGameE\SDL;C:\Users\Przemek\source\repos\2DGameE\2DGameE\Source\Components;C:\Users\Przemek\source\repos\SimpleShooter\2DGameE\Source;C:\Users\Przemek\source\repos\2DGameE\2DGameE\Source;C:\Users\Przemek\source\repos\2DGameE\2DGameE\SDL;$(IncludePath)</IncludePath>
-    <LibraryPath>C:\Users\Przemek\source\repos\SimpleShooter\2DGameE\lib\x86;$(LibraryPath)</LibraryPath>
+    <IncludePath>$(SolutionDir)\2DGameE\Source;$(SolutionDir)\2DGameE\SDL;$(IncludePath)</IncludePath>
+    <LibraryPath>$(SolutionDir)\2DGameE\lib\x86;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <IncludePath>D:\SimpleShooter\2DGameE\SDL;C:\Users\Przemek\source\repos\2DGameE\2DGameE\Source\Components;C:\Users\Przemek\source\repos\SimpleShooter\2DGameE\Source;C:\Users\Przemek\source\repos\2DGameE\2DGameE\SDL;$(IncludePath)</IncludePath>
-    <LibraryPath>C:\Users\Przemek\source\repos\SimpleShooter\2DGameE\lib\x64;$(LibraryPath)</LibraryPath>
+    <IncludePath>$(SolutionDir)\2DGameE\SDL;$(SolutionDir)\2DGameE\Source;$(IncludePath)</IncludePath>
+    <LibraryPath>$(SolutionDir)\2DGameE\lib\x64;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-    <IncludePath>D:\SimpleShooter\2DGameE\SDL;C:\Users\Przemek\source\repos\2DGameE\2DGameE\Source\Components;C:\Users\Przemek\source\repos\SimpleShooter\2DGameE\Source;C:\Users\Przemek\source\repos\2DGameE\2DGameE\SDL;$(IncludePath)</IncludePath>
-    <LibraryPath>C:\Users\Przemek\source\repos\SimpleShooter\2DGameE\lib\x64;$(LibraryPath)</LibraryPath>
+    <IncludePath>$(SolutionDir)\2DGameE\SDL;$(SolutionDir)\2DGameE\Source;$(IncludePath)</IncludePath>
+    <LibraryPath>$(SolutionDir)\2DGameE\lib\x64;$(LibraryPath)</LibraryPath>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Dedicated|x64'">
+    <LibraryPath>$(SolutionDir)\2DGameE\lib\x64;$(LibraryPath)</LibraryPath>
+    <IncludePath>$(SolutionDir)\2DGameE\SDL;$(SolutionDir)\2DGameE\Source;$(IncludePath)</IncludePath>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Dedicated|Win32'">
+    <LibraryPath>$(SolutionDir)\2DGameE\lib\x86;$(LibraryPath)</LibraryPath>
+    <IncludePath>$(SolutionDir)\2DGameE\SDL;$(SolutionDir)\2DGameE\Source;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -170,7 +205,7 @@
     <Link>
       <SubSystem>Console</SubSystem>
       <AdditionalLibraryDirectories>C:\Users\Przemek\source\repos\2DGameE\2DGameE\lib\x86;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>SDL2.lib;SDL2main.lib;SDL2_image.lib;SDL2_ttf.lib;SDL2_mixer.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>SDL2.lib;SDL2main.lib;SDL2_image.lib;SDL2_ttf.lib;SDL2_mixer.lib;SDL2_net.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -183,7 +218,7 @@
     </ClCompile>
     <Link>
       <AdditionalLibraryDirectories>C:\Users\Przemek\source\repos\SimpleShooter\2DGameE\lib\x64;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>SDL2.lib;SDL2main.lib;SDL2_image.lib;SDL2_ttf.lib;SDL2_mixer.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>SDL2.lib;SDL2main.lib;SDL2_image.lib;SDL2_ttf.lib;SDL2_mixer.lib;SDL2_net.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <SubSystem>Console</SubSystem>
     </Link>
   </ItemDefinitionGroup>
@@ -200,7 +235,7 @@
     <Link>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
-      <AdditionalDependencies>SDL2.lib;SDL2main.lib;SDL2_image.lib;SDL2_ttf.lib;SDL2_mixer.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>SDL2.lib;SDL2main.lib;SDL2_image.lib;SDL2_ttf.lib;SDL2_mixer.lib;SDL2_net.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalLibraryDirectories>C:\Users\Przemek\source\repos\2DGameE\2DGameE\lib\x86;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <SubSystem>Console</SubSystem>
     </Link>
@@ -218,9 +253,25 @@
     <Link>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
-      <AdditionalDependencies>SDL2.lib;SDL2main.lib;SDL2_image.lib;SDL2_ttf.lib;SDL2_mixer.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>SDL2.lib;SDL2main.lib;SDL2_image.lib;SDL2_ttf.lib;SDL2_mixer.lib;SDL2_net.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalLibraryDirectories>C:\Users\Przemek\source\repos\SimpleShooter\2DGameE\lib\x64;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Dedicated|x64'">
+    <Link>
+      <AdditionalDependencies>SDL2.lib;SDL2main.lib;SDL2_image.lib;SDL2_ttf.lib;SDL2_mixer.lib;SDL2_net.lib;%(AdditionalDependencies)</AdditionalDependencies>
+    </Link>
+    <ClCompile>
+      <PreprocessorDefinitions>_DEDICATED;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Dedicated|Win32'">
+    <Link>
+      <AdditionalDependencies>SDL2.lib;SDL2main.lib;SDL2_image.lib;SDL2_ttf.lib;SDL2_mixer.lib;SDL2_net.lib;%(AdditionalDependencies)</AdditionalDependencies>
+    </Link>
+    <ClCompile>
+      <PreprocessorDefinitions>_DEDICATED;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
   </ItemDefinitionGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

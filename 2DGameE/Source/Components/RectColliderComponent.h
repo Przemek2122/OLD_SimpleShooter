@@ -28,6 +28,5 @@ public:
 
 private:
 	bool moving = true;
-	float test = 0;
 
 };

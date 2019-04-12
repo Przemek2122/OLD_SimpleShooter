@@ -31,6 +31,12 @@
     <Filter Include="Source Files\ECS\Components">
       <UniqueIdentifier>{12484ae0-0743-4a8e-9727-810db16b9d24}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\Sockets">
+      <UniqueIdentifier>{12545d34-f5d0-41e8-8a73-ff4e8a05b259}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Sockets">
+      <UniqueIdentifier>{0760b1e2-0f93-459c-baae-103aa0d509b5}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Source\game.cpp">
@@ -123,11 +129,29 @@
     <ClCompile Include="Source\Components\TransparentColliderComponent.cpp">
       <Filter>Source Files\ECS\Components</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Socket.cpp">
-      <Filter>Source Files</Filter>
+    <ClCompile Include="Source\Sockets\SocketServer.cpp">
+      <Filter>Source Files\Sockets</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Sockets.cpp">
-      <Filter>Source Files</Filter>
+    <ClCompile Include="Source\Sockets\Socket.cpp">
+      <Filter>Source Files\Sockets</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Sockets\SocketClient.cpp">
+      <Filter>Source Files\Sockets</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Sockets\SocketClientTCP.cpp">
+      <Filter>Source Files\Sockets</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Sockets\SocketClientUDP.cpp">
+      <Filter>Source Files\Sockets</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Sockets\Sockets.cpp">
+      <Filter>Source Files\Sockets</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Sockets\SocketServerUDP.cpp">
+      <Filter>Source Files\Sockets</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Sockets\SocketServerTCP.cpp">
+      <Filter>Source Files\Sockets</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -236,11 +260,32 @@
     <ClInclude Include="Source\Components\TransparentColliderComponent.h">
       <Filter>Header Files\ECS\Components</Filter>
     </ClInclude>
-    <ClInclude Include="Source\Socket.h">
+    <ClInclude Include="Source\ErrorCodes.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Source\Sockets.h">
-      <Filter>Header Files</Filter>
+    <ClInclude Include="Source\Sockets\SocketServer.h">
+      <Filter>Header Files\Sockets</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Sockets\Socket.h">
+      <Filter>Header Files\Sockets</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Sockets\SocketClient.h">
+      <Filter>Header Files\Sockets</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Sockets\SocketClientTCP.h">
+      <Filter>Header Files\Sockets</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Sockets\SocketClientUDP.h">
+      <Filter>Header Files\Sockets</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Sockets\Sockets.h">
+      <Filter>Header Files\Sockets</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Sockets\SocketServerUDP.h">
+      <Filter>Header Files\Sockets</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Sockets\SocketServerTCP.h">
+      <Filter>Header Files\Sockets</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

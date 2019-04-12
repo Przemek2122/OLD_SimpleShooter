@@ -86,23 +86,23 @@ public:
 		Mix_VolumeMusic(100);
 	}
 
-	template<typename Type>
-	Type& getWidget(std::string id)
+	template<typename T>
+	T& getWidget(std::string id)
 	{
 		// Check if exists
 		// TODO
 
 		//if (Widgets[id] != nullptr)
-		return *static_cast<Type*>(sounds[id]);
+		return *static_cast<T*>(sounds[id]);
 	}
 
-	template<typename Type, typename ...TArgs>
-	Type& addWidget(std::string id, TArgs && ...mArgs)
+	template<typename T, typename ...TArgs>
+	T& addWidget(std::string id, TArgs && ...mArgs)
 	{
 		// Check if not exists
 		// TODO
 
-		Type* t(new Type(std::forward<TArgs>(mArgs)...));
+		T* t(new T(std::forward<TArgs>(mArgs)...));
 
 		sounds.emplace(id, t);
 

@@ -5,39 +5,39 @@
 #include <climits>
 
 /* T is type of x and y (Can be float can be double, etc). */
-template<class Type = float>
+template<class T = float>
 class Vector2D
 {
 public:
-	Type X;
-	Type Y;
+	T X;
+	T Y;
 
-	Vector2D() : X(Type(0)), Y(Type(0)) {}
-	Vector2D(const Type x, const Type y) : X(x), Y(y) {}
+	Vector2D() : X(T(0)), Y(T(0)) {}
+	Vector2D(const T x, const T y) : X(x), Y(y) {}
 	template<typename oldType>
-	Vector2D(Vector2D<oldType> oldVector) { X = (Type)oldVector.X; Y = (Type)oldVector.Y; }
+	Vector2D(Vector2D<oldType> oldVector) { X = (T)oldVector.X; Y = (T)oldVector.Y; }
 
 	// Comparsion
 	template<typename oldType>
-	Vector2D operator=(const Vector2D<oldType> &oldVector) { X = (Type)oldVector.X; Y = (Type)oldVector.Y; return *this; }
+	Vector2D operator=(const Vector2D<oldType> &oldVector) { X = (T)oldVector.X; Y = (T)oldVector.Y; return *this; }
 
 	// Set to negative value
 	Vector2D operator-() const { return Vector2D(-X, -Y); }
 
 	// Basic calculations
-	friend Vector2D operator+(const Vector2D<Type>& v1, const Vector2D<Type>& v2) { return Vector2D<Type>(v1.X + v2.X, v1.Y + v2.Y); }
-	friend Vector2D operator-(const Vector2D<Type>& v1, const Vector2D<Type>& v2) { return Vector2D<Type>(v1.X - v2.X, v1.Y - v2.Y); }
-	friend Vector2D operator*(const Vector2D<Type>& v1, const Vector2D<Type>& v2) { return Vector2D<Type>(v1.X * v2.X, v1.Y * v2.Y); }
-	friend Vector2D operator/(const Vector2D<Type>& v1, const Vector2D<Type>& v2) { return Vector2D<Type>(v1.X / v2.X, v1.Y / v2.Y); }
+	friend Vector2D operator+(const Vector2D<T>& v1, const Vector2D<T>& v2) { return Vector2D<T>(v1.X + v2.X, v1.Y + v2.Y); }
+	friend Vector2D operator-(const Vector2D<T>& v1, const Vector2D<T>& v2) { return Vector2D<T>(v1.X - v2.X, v1.Y - v2.Y); }
+	friend Vector2D operator*(const Vector2D<T>& v1, const Vector2D<T>& v2) { return Vector2D<T>(v1.X * v2.X, v1.Y * v2.Y); }
+	friend Vector2D operator/(const Vector2D<T>& v1, const Vector2D<T>& v2) { return Vector2D<T>(v1.X / v2.X, v1.Y / v2.Y); }
 
 	template <typename othertype>
-	friend Vector2D operator+(const Vector2D<othertype>& v1, const Vector2D<Type>& v2) { return Vector2D<Type>((Type)v1.X + v2.X, (Type)v1.Y + v2.Y); }
+	friend Vector2D operator+(const Vector2D<othertype>& v1, const Vector2D<T>& v2) { return Vector2D<T>((T)v1.X + v2.X, (T)v1.Y + v2.Y); }
 	template <typename othertype>
-	friend Vector2D operator-(const Vector2D<othertype>& v1, const Vector2D<Type>& v2) { return Vector2D<Type>(v1.X - v2.X, v1.Y - v2.Y); }
+	friend Vector2D operator-(const Vector2D<othertype>& v1, const Vector2D<T>& v2) { return Vector2D<T>(v1.X - v2.X, v1.Y - v2.Y); }
 	template <typename othertype>
-	friend Vector2D operator*(const Vector2D<othertype>& v1, const Vector2D<Type>& v2) { return Vector2D<Type>(v1.X * v2.X, v1.Y * v2.Y); }
+	friend Vector2D operator*(const Vector2D<othertype>& v1, const Vector2D<T>& v2) { return Vector2D<T>(v1.X * v2.X, v1.Y * v2.Y); }
 	template <typename othertype>
-	friend Vector2D operator/(const Vector2D<othertype>& v1, const Vector2D<Type>& v2) { return Vector2D<Type>(v1.X / v2.X, v1.Y / v2.Y); }
+	friend Vector2D operator/(const Vector2D<othertype>& v1, const Vector2D<T>& v2) { return Vector2D<T>(v1.X / v2.X, v1.Y / v2.Y); }
 
 	Vector2D& operator+=(const Vector2D& v) { X += v.X; Y += v.Y; return *this; }
 	Vector2D& operator-=(const Vector2D& v) { X -= v.X; Y -= v.Y; return *this; }
@@ -81,7 +81,7 @@ public:
 	////Return the point where two lines intersect.
 	//template<class T> Vector2d<T> GetIntersect(const Vector2d<T>&, const Vector2d<T>&, const Vector2d<T>&, const Vector2d<T>&)
 
-	Vector2D& Zero() { X = Type(0); Y = Type(0); }
+	Vector2D& Zero() { X = T(0); Y = T(0); }
 
 	// Conversion
 	operator std::ostream () const { std::ostream stream = "(" + X + "," + Y + ")"; return stream; }

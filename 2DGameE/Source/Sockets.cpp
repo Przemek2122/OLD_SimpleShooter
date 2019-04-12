@@ -1,12 +1,9 @@
-#include "Sockets.h"
+#include "Sockets/Sockets.h"
 
 
-
-SocketsManager::SocketsManager()
-{
-}
-
+SocketsManager::SocketsManager(Game * mGame) : game(mGame)
+{}
 
 SocketsManager::~SocketsManager()
-{
-}
+{}
+
