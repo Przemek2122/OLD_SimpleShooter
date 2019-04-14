@@ -26,14 +26,15 @@ public:
 
 	/* Server listener socket.
 	 * Only used on server */
-	SocketServerTCP * socketsServer;
+	SocketServerTCP * socketServer;
 
 	/* Connected clients sockets:
 	 * Clients connected in map
-	 * With ip as string and
-	 * With names as strings. */
-	//std::map<>
+	 * With @names as string. */
+	std::map < TCPsocket*, std::string > clientSocketsTCP;
 
+
+	void Update();
 
 	/* Attempts to connect with
 	 * server at @domain with @port
@@ -44,6 +45,10 @@ public:
 	/* Creates listener socket.
 	 * Default tag is "server". */
 	bool Listen(Uint16 port, std::string tag = "server");
+
+	/* Check if there is a player with
+	that name on server (clientSocketsTCP) */
+	bool HasThatName(std::string name);
 
 	/* Assuming this is not server.
 	 * Probably crash if called on server.

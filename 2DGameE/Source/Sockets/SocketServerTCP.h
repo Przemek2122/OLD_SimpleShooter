@@ -12,6 +12,11 @@ public:
 
 	bool Listen(Uint16 port);
 
+	void Send(char * data);
+
+	char * Recive();
+
+
 
 };
 

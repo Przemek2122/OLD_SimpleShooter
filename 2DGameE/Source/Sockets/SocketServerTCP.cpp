@@ -3,14 +3,9 @@
 
 int SocketServerTCP::SocketThread(void *ptr)
 {
-	int cnt;
+	Util::Debug("Thread is running.");
 
-	for (cnt = 0; cnt < 10; ++cnt) {
-		printf("Thread counter: %d\n", cnt);
-		SDL_Delay(50);
-	}
-
-	return cnt;
+	return 1;
 }
 
 SocketServerTCP::SocketServerTCP(std::string tag) : SocketServer(tag)
@@ -43,4 +38,35 @@ bool SocketServerTCP::Listen(Uint16 port)
 		Util::Error("SDLNet_TCP_Open: " + (std::string)SDLNet_GetError());
 		return false;
 	}
+}
+
+void SocketServerTCP::Send(char * data)
+{
+	int len, result;
+
+	len = strlen(data) + 1; // Add one for the terminating NULL
+	result = SDLNet_TCP_Send(tcpSock, data, len);
+	if (result < len)
+	{
+		Util::Debug("SDLNet_TCP_Send: " + (std::string)SDLNet_GetError());
+		// It may be good to disconnect sock because it is likely invalid now.
+	}
+}
+
+char * SocketServerTCP::Recive()
+{
+#define MAXLEN 1024
+	int result;
+	char msg[MAXLEN];
+
+	result = SDLNet_TCP_Recv(tcpSock, msg, MAXLEN);
+	if (result <= 0)
+	{
+		// An error may have occured, but sometimes you can just ignore it
+		// It may be good to disconnect sock because it is likely invalid now.
+	}
+
+	Util::Debug("Received: " + (std::string)msg);
+
+	return msg;
 }

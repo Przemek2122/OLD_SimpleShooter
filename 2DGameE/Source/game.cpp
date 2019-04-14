@@ -206,9 +206,10 @@ void Game::update()
 	map->updateCollision();
 	manager.update();
 	UiManager->update();
+	sockets->Update();
 
 	// FPS Counter
-	if (checkFPS == true)
+	if (checkFPS)
 	{
 		time_t rawtime;
 		time(&rawtime);
@@ -255,6 +256,7 @@ void Game::clean()
 	//SDL_DestroyRenderer(renderer); // Causes infinite loop / freez when destroying ?! @TODO FIX
 	TTF_Quit();
 	Mix_CloseAudio();
+	SDLNet_Quit();
 	SDL_Quit();
 
 	Util::Info("Game cleaned.");

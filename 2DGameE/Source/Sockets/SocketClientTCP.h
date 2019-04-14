@@ -15,6 +15,12 @@ public:
 
 	bool Connect(const char * domain, Uint16 port);
 
+	void Send(char * data);
+
+	char * Recive();
+
+	//void TestPing();
+
 
 };
 
