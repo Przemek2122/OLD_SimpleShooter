@@ -1,16 +1,15 @@
 #pragma once
 #include "SocketServer.h"
+#include <iostream>
+
 class SocketServerTCP : public SocketServer
 {
 public:
 	SocketServerTCP(std::string tag);
 	~SocketServerTCP();
 
-	TCPsocket tcpSock;
 
-	static int SocketThread(void * ptr);
-
-	bool Listen(Uint16 port);
+	bool Listen(unsigned short port);
 
 	void Send(char * data);
 

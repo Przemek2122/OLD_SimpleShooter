@@ -1,76 +1,64 @@
-#include "Sockets/SocketClientTCP.h"
+#include "SocketClientTCP.h"
+#include "SocketDataParser.h"
+#include <boost/array.hpp>
 #include "Util.h"
 
-int SocketClientTCP::SocketThread(void *ptr)
-{
-	Util::Debug("Thread is running.");
+using boost::asio::ip::tcp;
 
-	return 1;
-}
+
 
 SocketClientTCP::SocketClientTCP(std::string tag) : SocketClient(tag)
-{}
+{
+
+}
 
 SocketClientTCP::~SocketClientTCP()
+{}
+
+bool SocketClientTCP::Connect(const char * domain, unsigned short port)
 {
-	// Terminate thread
-	int * status = 0;
-	SDL_WaitThread(sockThread, status);
-
-	// Close the connection on sock
-	SDLNet_TCP_Close(tcpSock);
-}
-
-bool SocketClientTCP::Connect(const char * domain, Uint16 port)
-{
-	sockThread = SDL_CreateThread(SocketClientTCP::SocketThread, SocketTag.c_str(), (void *)NULL);
-
-	//SDLNet_ResolveHost(&IpAddress, domain, port);
-
-	// Connect to localhost at port using TCP (client)
-	if (SDLNet_ResolveHost(&IpAddress, domain, port) == -1)
+	try
 	{
-		Util::Error("SDLNet_ResolveHost: " + (std::string)SDLNet_GetError());
+		boost::asio::io_context io_context;
+
+		tcp::resolver resolver(io_context);
+		tcp::resolver::results_type endpoints =
+			resolver.resolve(domain, "daytime");
+
+		tcp::socket socket(io_context);
+		boost::asio::connect(socket, endpoints);
+
+		for (;;)
+		{
+			boost::array<char, 128> buf;
+			boost::system::error_code error;
+
+			size_t len = socket.read_some(boost::asio::buffer(buf), error);
+
+			if (error == boost::asio::error::eof)
+				break; // Connection closed cleanly by peer.
+			else if (error)
+				throw boost::system::system_error(error); // Some other error.
+
+			std::cout.write(buf.data(), len);
+		}
+
+		return true;
+	}
+	catch (std::exception& e)
+	{
+		Util::Debug(e.what());
+		//std::cerr << e.what() << std::endl;
 		return false;
 	}
-
-	tcpSock = SDLNet_TCP_Open(&IpAddress);
-	if (!tcpSock)
-	{
-		Util::Error("SDLNet_TCP_Open: " + (std::string)SDLNet_GetError());
-		return false;
-	}
-
-	return true;
 }
 
-void SocketClientTCP::Send(char * data)
+void SocketClientTCP::Send(const char * data)
 {
-	int len, result;
-
-	len = strlen(data) + 1; // add one for the terminating NULL
-	result = SDLNet_TCP_Send(tcpSock, data, len);
-	if (result < len) 
-	{
-		Util::Debug("SDLNet_TCP_Send: " + (std::string)SDLNet_GetError());
-		// It may be good to disconnect sock because it is likely invalid now.
-	}
+	
 }
 
 char * SocketClientTCP::Recive()
 {
-#define MAXLEN 1024
-	int result;
-	char msg[MAXLEN];
-
-	result = SDLNet_TCP_Recv(tcpSock, msg, MAXLEN);
-	if (result <= 0) 
-	{
-		// An error may have occured, but sometimes you can just ignore it
-		// It may be good to disconnect sock because it is likely invalid now.
-	}
-
-	Util::Debug("Received: " + (std::string)msg);
-
-	return msg;
+	return nullptr;
 }

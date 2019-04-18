@@ -18,7 +18,7 @@ int main(int argc, char * argv[])
 			switch (argv[0][1]) 
 			{
 			case 's':
-				Util::Info("option s is found. Enabling server.");
+				Util::Info("Found s option. Enabling server.");
 				game->server = true;
 				break;
 

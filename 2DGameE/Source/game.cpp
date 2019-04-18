@@ -2,6 +2,9 @@
 #include "ErrorCodes.h"
 
 #include "Sockets/Sockets.h"
+#include "Sockets/SocketClientTCP.h"
+#include "Sockets/SocketServerTCP.h"
+#include "Sockets/SocketDataParser.h"
 
 #include "Components/CameraManager.h"
 
@@ -120,13 +123,6 @@ void Game::init(const char* title, int xpos, int ypos, int width, int height, bo
 		Util::Error("SDL_mixer: %s\n" + (std::string)Mix_GetError() + (std::string)SDL_GetError());
 		exit(8);
 	}
-
-	// Initialize sdl net
-	if (SDLNet_Init() == -1)
-	{
-		Util::Error("SDLNet_Init: %s\n" + (std::string)SDLNet_GetError() + (std::string)SDL_GetError());
-		exit(9);
-	}
 	
 	SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "2");
 
@@ -145,12 +141,16 @@ void Game::init(const char* title, int xpos, int ypos, int width, int height, bo
 	// Sockets
 	sockets = new SocketsManager(this);
 	if (server)
-		sockets->Listen(21000);
+	{
+		sockets->Listen(63000);
+	}
 	else
-		sockets->Connect(
-			"localhost",
-			21000
-		);
+	{
+		if (sockets->Connect("localhost", 63000))
+			Util::Debug("Connection succesfull!");
+		else
+			Util::Debug("Connection failed!");
+	}
 
 	// Camera
 	cameraManager.addComponent<CameraManagerComponent>();
@@ -256,7 +256,6 @@ void Game::clean()
 	//SDL_DestroyRenderer(renderer); // Causes infinite loop / freez when destroying ?! @TODO FIX
 	TTF_Quit();
 	Mix_CloseAudio();
-	SDLNet_Quit();
 	SDL_Quit();
 
 	Util::Info("Game cleaned.");

@@ -1,6 +1,11 @@
 #pragma once
 #include <string>
-#include "SDL_net.h"
+#include <boost/asio.hpp>
+#ifdef _DEBUG
+#define BOOST_ASIO_ENABLE_BUFFER_DEBUGGING
+#else
+#define BOOST_ASIO_DISABLE_BUFFER_DEBUGGING
+#endif
 
 class Socket
 {
@@ -10,7 +15,4 @@ public:
 
 	std::string SocketTag;
 
-	IPaddress IpAddress;
-
 };
-

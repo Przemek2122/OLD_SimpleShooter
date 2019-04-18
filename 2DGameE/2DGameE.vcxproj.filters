@@ -153,6 +153,9 @@
     <ClCompile Include="Source\Sockets\SocketServerTCP.cpp">
       <Filter>Source Files\Sockets</Filter>
     </ClCompile>
+    <ClCompile Include="Source\Sockets\SocketDataParser.cpp">
+      <Filter>Source Files\Sockets</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Source\EventsHandler.h">
@@ -285,6 +288,9 @@
       <Filter>Header Files\Sockets</Filter>
     </ClInclude>
     <ClInclude Include="Source\Sockets\SocketServerTCP.h">
+      <Filter>Header Files\Sockets</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Sockets\SocketDataParser.h">
       <Filter>Header Files\Sockets</Filter>
     </ClInclude>
   </ItemGroup>

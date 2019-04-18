@@ -19,10 +19,13 @@ namespace Util
 	std::string logPrefix = "log_";
 	std::string logFilePath = logDir + "/" + logPrefix + GetCurrentTimeNoSpecial();
 
+	/* Call before calling logging functions.
+	 * It will don't create any error otherwise
+	 * but will don't log anthing to file. */
 	void LogInit(bool enableLogging, int logLevel)
 	{
-		// TODO - Create directory error if doesn't exist
-		// TODO - Crossplatform
+		// @TODO - Create directory error if doesn't exist (Windows only)
+		// @TODO - Crossplatform
 
 		if (enableLogging)
 		{
@@ -31,17 +34,19 @@ namespace Util
 #if defined(_WIN32) || defined(_WIN64)
 			namespace fs = std::experimental::filesystem;
 
-			if (!fs::is_directory(logDir) || !fs::exists(logDir)) { // Check if src folder exists
-				fs::create_directory(logDir); // create src folder
+			if (!fs::is_directory(logDir) || !fs::exists(logDir)) // Check if folder exists
+			{
+				// Create folder if not
+				fs::create_directory(logDir);
 			}
 #endif
 
 // Linux
 #ifdef linux
 // TODO create dir on linux
+			Util::Warning("Creating directory on linux isn't implemented yet. Please create one or log will don't be created");
 #endif
 			isLoggingEnabled = true;
-			//std::cout << "Logging to " << logFilePath << std::endl;
 			Util::Info("Logging to: " + logFilePath);
 		}
 		else
@@ -52,23 +57,30 @@ namespace Util
 		loggingLevel = logLevel;
 	}
 
-	long long int GetMiliseconds()
+	/* Return current Milisecond */
+	inline long long int GetMiliseconds()
 	{
 		return std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count();
 	}
 
+	/* Starts delay you need variable long long int and pass it as reference */
 	void startDelay(long long int &startMs)
 	{
 		startMs = GetMiliseconds();
 	}
 
+	/* Use this to check pass startMs 
+	 * (start with startDelay() first!)
+	 * delayMs is refernce for performance */
 	bool isDelayed(long long int &startMs, long int &delayMs)
 	{
 		if (GetMiliseconds() >= startMs + delayMs)
 			return true;
+		// else
 		return false;
 	}
 
+	/* Return simple rawtime */
 	time_t GetRawtime()
 	{
 		time_t rawtime;
@@ -79,6 +91,9 @@ namespace Util
 		return rawtime;
 	}
 	
+	/* Returns current time in format: 
+	 * day_month_year_hour_minute_second 
+	 * eg: 6_04_2018_11_7_59 */
 	std::string GetCurrentTimeNoSpecial() 
 	{
 		std::string MonthTable[12] = { "01", "02", "03", "04", "05", "06", "07", "08", "09", "10", "11", "12" };
@@ -94,6 +109,8 @@ namespace Util
 		return ctm;
 	}
 
+	/* Returns current time in format:
+	 *  */
 	std::string GetCurrTime() 
 	{
 		std::string MonthTable[12] = { "01", "02", "03", "04", "05", "06", "07", "08", "09", "10", "11", "12" };

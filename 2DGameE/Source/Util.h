@@ -14,7 +14,7 @@ namespace Util
 	void LogInit(bool enableLogging = true, int logLevel = 1);
 
 	/* Returns current milisecond since epoch(1 January 1970) in long long int */
-	long long int GetMiliseconds();
+	inline long long int GetMiliseconds();
 	/* Starts delay.
 	 * @param startMs should be long long int &.
 	 * This functions sets time in ms. */
@@ -26,15 +26,15 @@ namespace Util
 
 	/* Returns safe rawtime 
 	 * @see http://www.cplusplus.com/reference/ctime/ctime/ */
-	time_t GetRawtime();
+	inline time_t GetRawtime();
 	/* Returns current time in format 12_01_2019_12_37_23. */
-	std::string GetCurrentTimeNoSpecial(); 
+	inline std::string GetCurrentTimeNoSpecial(); 
 	/* Returns current time in format 12:01:2019 12:37:23. */
-	std::string GetCurrTime();
+	inline std::string GetCurrTime();
 
 	/* Logs (Info): with white(default) color.
 	 * Logs to file when isLoggingEnabled is true. */
-	void Info(std::string message); // __fastcall
+	void Info(std::string message); // __fastcall - @todo try it
 	/* Logs (Debug): with log color.
 	 * LOGS ONLY WHEN IN Debug mode.
 	 * This is empty function in release.
@@ -57,7 +57,7 @@ namespace Util
 	extern std::string logFilePath;
 	/* Log directory. Deault: "log". */
 	extern std::string logDir;
-	/* Log prefix eg: log_13_01_19... Defult: "log_" */
+	/* Log prefix. Defult: "log_". eg: log_13_01_19... */
 	extern std::string logPrefix;
 	/* Sets whether logging to file is enabled or not with LogInit() function. */
 	extern bool isLoggingEnabled;

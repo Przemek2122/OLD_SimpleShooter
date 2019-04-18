@@ -7,7 +7,5 @@ public:
 	SocketClient(std::string tag);
 	~SocketClient();
 
-	SDL_Thread *sockThread;
-
 };
 

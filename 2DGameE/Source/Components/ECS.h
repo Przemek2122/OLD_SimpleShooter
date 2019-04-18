@@ -43,6 +43,8 @@ class Component
 public:
 	Entity * entity;
 
+	unsigned int entityID;
+
 	virtual void init() {}
 	virtual void postInit() {}
 	virtual void update() {}
@@ -56,7 +58,7 @@ private:
 	Manager & manager;
 	bool pendingDelete = false;
 	bool active = true;
-	int entityID;
+	unsigned int entityID;
 	std::vector<std::unique_ptr<Component>> components;
 
 	ComponentArray componentArray;
@@ -65,31 +67,37 @@ private:
 public:
 	Entity(Manager& mManager) : manager(mManager) {}
 
+	/* Called after construct */
 	void init()
 	{
 		for (auto& c : components) c->init();
 	}
+	//[[deprecated("Use init() instead")]]
 	void postInit()
 	{
 		for (auto& c : components) c->postInit();
 	}
+	/* Called every frame. (Mostly for calculations.) */
 	void update()
 	{
 		for (auto& c : components)
 			if (active) c->update();
 	}
+	/* Called every fram.e (Drawing stuff.) */
 	void render()
 	{
 		for (auto& c : components)
 			if (active) c->render();
 	}
 
+	/* Call to mark entity as to be deleted. */
 	void destroy()
 	{
 		pendingDelete = true;
 		deactivate();
 	}
 
+	/* Check if entity is going to be destroyed. */
 	bool isPendingDestroy() const { return pendingDelete; }
 	void deactivate() { active = false; }
 	void activate() { active = true; }
@@ -109,6 +117,8 @@ public:
 
 		componentArray[getComponentTypeID<T>()] = c;
 		componentBitset[getComponentTypeID<T>()] = true;
+
+		c->entityID = components.size() - 1;
 
 		c->init();
 		return *c;
@@ -135,14 +145,19 @@ public:
 		}
 	}
 
-	void setEnitityID(int newID)
+	void setEnitityID(unsigned int newID)
 	{
 		entityID = newID;
 	}
 
-	int getEntityID()
+	unsigned int getEntityID()
 	{
 		return entityID;
+	}
+
+	unsigned int getNumOfComponents()
+	{
+		return components.size();
 	}
 
 	Manager & getManager()
@@ -155,7 +170,7 @@ class Manager
 {
 private:
 	bool firstRun = true;
-	int numOfEntities = 0;
+	unsigned int numOfEntities = 0;
 
 public:
 	Game * game = nullptr;
