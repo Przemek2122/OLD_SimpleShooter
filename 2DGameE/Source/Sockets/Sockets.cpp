@@ -3,10 +3,14 @@
 
 
 SocketsManager::SocketsManager(Game * mGame) : game(mGame)
-{}
+{
+	Socket::sockInit();
+}
 
 SocketsManager::~SocketsManager()
-{}
+{
+	Socket::sockQuit();
+}
 
 void SocketsManager::Update()
 {
@@ -23,16 +27,14 @@ bool SocketsManager::Connect(const char * domain, int port)
 	return localSocketTCP->Connect(domain, port);
 }
 
-bool SocketsManager::Listen(int port)
+bool SocketsManager::Listen(const char * domain, unsigned short port, bool allAdresses)
 {
 	// Create new if invalid
 	if (!socketServerTCP)
 		socketServerTCP = new SocketServerTCP("server");
 
-	socketServerTCP->Listen(port);
-
 	// Start listening
-	return true;
+	return socketServerTCP->Listen(domain, port, allAdresses);
 }
 
 bool SocketsManager::HasThatName(std::string name)

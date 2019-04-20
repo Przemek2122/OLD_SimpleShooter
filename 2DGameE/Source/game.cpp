@@ -142,11 +142,14 @@ void Game::init(const char* title, int xpos, int ypos, int width, int height, bo
 	sockets = new SocketsManager(this);
 	if (server)
 	{
-		sockets->Listen(63000);
+		if (sockets->Listen("127.0.0.3", 62000, true))
+			Util::Debug("Listening succesfull!");
+		else
+			Util::Debug("Listening failed!");
 	}
 	else
 	{
-		if (sockets->Connect("localhost", 63000))
+		if (sockets->Connect("127.0.0.2", 62000))
 			Util::Debug("Connection succesfull!");
 		else
 			Util::Debug("Connection failed!");

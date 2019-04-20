@@ -3,6 +3,8 @@
 #include <map>
 #include "Util.h"
 #include "game.h"
+#include "Sockets/SocketClientUDP.h"
+#include "Sockets/SocketServerUDP.h"
 #include "Sockets/SocketClientTCP.h"
 #include "Sockets/SocketServerTCP.h"
 
@@ -18,7 +20,6 @@ public:
 
 #ifndef _DEDICATED
 	/* TCP socket
-	 * Local socket used to connect and use later
 	 * Only used on client
 	 * Doesn't exists on dedicated */
 	SocketClientTCP * localSocketTCP;
@@ -31,7 +32,7 @@ public:
 	/* Connected clients sockets:
 	 * Clients connected in map
 	 * With @names as string. */
-	std::map < char*, std::string > clientSocketsTCP;
+	std::map < SocketClientTCP, std::string > clientSocketsTCP;
 
 	/* Check for incoming connections etc... */
 	void Update();
@@ -42,12 +43,14 @@ public:
 	bool Connect(const char * domain, int port);
 
 	/* Creates listener socket.
-	 * Default tag is "server". */
-	bool Listen(int port);
+	 * Default tag is "server".
+	 * You can allow only specific address on port 
+	 * or all with setting allAdresses to true. */
+	bool Listen(const char * domain, unsigned short port, bool allAdresses);
 
 	/* Check if there is a player with
 	that name on server (clientSocketsTCP) */
-	bool HasThatName(std::string name);
+	inline bool HasThatName(std::string name);
 
 	///* Assuming this is not server.
 	// * Will return socket with error on dedicated

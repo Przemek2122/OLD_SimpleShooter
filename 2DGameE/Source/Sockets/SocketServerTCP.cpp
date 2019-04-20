@@ -1,73 +1,140 @@
 #include "SocketServerTCP.h"
 #include "Util.h"
-#include <ctime>
-#include <iostream>
-#include <string>
-#include <boost/bind.hpp>
-#include <boost/shared_ptr.hpp>
-#include <boost/enable_shared_from_this.hpp>
+#include "SocketDataParser.h"
+#include <memory>
 
 
-using boost::asio::ip::tcp;
+InAcceptData::InAcceptData() {}
 
-std::string make_daytime_string()
-{
-	using namespace std; // For time_t, time and ctime;
-	time_t now = time(0);
-	return ctime(&now);
-}
-
-SocketServerTCP::SocketServerTCP(std::string tag) : SocketServer(tag)
+InAcceptData::InAcceptData(TCPAcceptManager * mTcpAcceptManager, unsigned int mPort, char * mAddress, bool anyAddr)
+	: tcpAcceptManager(mTcpAcceptManager), port(mPort), address(mAddress), anyAddress(anyAddr)
 {}
 
-SocketServerTCP::~SocketServerTCP()
-{
 
+TCPHandler::TCPHandler(SocketServerTCP * srvTCP, SOCKET * accptSock) : sockSrvTCP(srvTCP), sock(accptSock){}
+
+TCPHandler::~TCPHandler(){}
+
+int TCPHandler::Thread(void * ptr)
+{
+	return 0;
 }
 
-bool SocketServerTCP::Listen(unsigned short port)
+
+TCPAcceptManager::TCPAcceptManager(SocketServerTCP * srvTCP) : SockSrvTCP(srvTCP)
 {
-	try
+	running = true;
+}
+
+TCPAcceptManager::~TCPAcceptManager()
+{}
+
+
+SocketServerTCP::SocketServerTCP(std::string tag) : SocketServer(tag){}
+
+SocketServerTCP::~SocketServerTCP(){}
+
+int SocketServerTCP::AcceptThread(void * ptr)
+{
+	InAcceptData * acceptData = (InAcceptData *)ptr;
+	TCPAcceptManager * TcpAcceptManager = acceptData->tcpAcceptManager;
+
+	TcpAcceptManager->SockSrvTCP->mainSocket = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
+	if (TcpAcceptManager->SockSrvTCP->mainSocket == INVALID_SOCKET)
 	{
-		Util::Debug("Should start listening at port: " + std::to_string(port));
+		Util::Debug((std::string)"Error creating socket: " + std::to_string(getSockError()));
+		closesocket(TcpAcceptManager->SockSrvTCP->mainSocket);
 
-		boost::asio::io_context io_context;
-
-		tcp::acceptor acceptor(io_context, tcp::endpoint(tcp::v4(), 13));
-
-		for (;;)
-		{
-			tcp::socket socket(io_context);
-			acceptor.accept(socket);
-
-			std::string message = make_daytime_string();
-
-			Util::Debug("Something accepted.");
-
-			boost::system::error_code ignored_error;
-			boost::asio::write(socket, boost::asio::buffer(message), ignored_error);
-		}
-
-		return true;
-	}
-	catch (std::exception& e)
-	{
-		Util::Error(e.what());
-		//std::cerr << e.what() << std::endl;
 		return false;
 	}
-	
+
+	sockaddr_in service;
+	memset(&service, 0, sizeof(service));
+	service.sin_family = AF_INET;
+	if (acceptData->anyAddress)
+		service.sin_addr.s_addr = inet_addr("0.0.0.0");
+	else
+		service.sin_addr.s_addr = inet_addr(acceptData->address);
+	service.sin_port = htons(acceptData->port);
+
+	if (bind(TcpAcceptManager->SockSrvTCP->mainSocket, (SOCKADDR *)& service, sizeof(service)) == SOCKET_ERROR)
+	{
+		Util::Error("bind() failed." + std::to_string(getSockError()));
+		closesocket(TcpAcceptManager->SockSrvTCP->mainSocket);
+		return false;
+	}
+
+	if (listen(TcpAcceptManager->SockSrvTCP->mainSocket, 1) == SOCKET_ERROR)
+		Util::Error("Error listening on socket.");
+
+	Util::Info("Waiting for a client to connect... /n");
+	if (acceptData->anyAddress)
+		Util::Info("(PORT: " + std::to_string(acceptData->port) +
+			(std::string)", Bound all IP Adresses) \n");
+	else
+		Util::Info("(PORT: " + std::to_string(acceptData->port) +
+			(std::string)", Bound IP: " + acceptData->address + ") \n");
+
+	while (TcpAcceptManager->running)
+	{
+		SOCKET acceptSocket = SOCKET_ERROR;
+
+		SOCKADDR_IN addr;
+		int addrlen = sizeof(addr);
+
+		while (acceptSocket == SOCKET_ERROR)
+		{
+			acceptSocket = accept(TcpAcceptManager->SockSrvTCP->mainSocket, (SOCKADDR*)&addr, &addrlen);
+		}
+
+		char *ip = inet_ntoa(addr.sin_addr);
+		Util::Info("Found incoming connection from: " + (std::string)ip);
+
+		std::unique_ptr <SOCKET> uSockPtr{ &acceptSocket };
+
+		TcpAcceptManager->SockSrvTCP->sockets.emplace_back(std::move(uSockPtr));
+
+		Util::Info("Client connected.");
+	}
+
 	return false;
 }
 
-void SocketServerTCP::Send(char * data)
+bool SocketServerTCP::Listen(const char * domain, unsigned short port, bool allAdresses)
 {
-	
+	tcpAccept = new TCPAcceptManager(this);
+
+	InAcceptData * acceptData;
+
+	acceptData = new InAcceptData(tcpAccept, port, (char *)domain, allAdresses);
+
+	thread = SDL_CreateThread(SocketServerTCP::AcceptThread, "TCPAccept", acceptData);
+
+	Recive();
+
+	return true;
 }
 
+// @Todo move to thread
+void SocketServerTCP::Send(char * data)
+{
+	int bytesSent;
+	int bytesRecv = SOCKET_ERROR;
+	char sendbuf[32] = "Client says hello!";
+
+	bytesSent = send(mainSocket, sendbuf, strlen(sendbuf), 0);
+	Util::Debug("Send: " + bytesSent);
+}
+
+// @Todo move to thread
 char * SocketServerTCP::Recive()
 {
+	int bytesRecv = SOCKET_ERROR;
+	char recvbuf[32] = "";
 
+	bytesRecv = recv(mainSocket, recvbuf, 32, 0);
+	Util::Debug("Bytes received: " + bytesRecv);
+	Util::Debug("Received text: " + (std::string)recvbuf);
 
 	return nullptr;
 }

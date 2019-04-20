@@ -158,7 +158,7 @@ namespace Util
 
 	void Warning(std::string message) 
 	{
-		message = GetCurrTime() + " (Warrning): " + message;
+		message = GetCurrTime() + " (Warning): " + message;
 		PrintToConsole(message, 6);
 
 		if (isLoggingEnabled)
