@@ -1,6 +1,12 @@
 #pragma once
 #include <string>
 
+// Socket data start sequence
+#define SocketDataStart "AA"
+// Socket data end sequence
+#define SocketDataEnd NULL 
+// Socket data for separating in automated parsing.
+#define SocketDataSeparator '#~'
 
 /* Here is as follows:
 Any custom data:
@@ -19,6 +25,11 @@ enum SocketObjectType
 	SOCKETOBJECT_COMPONENT = 3,
 };
 
+struct InitialData
+{
+	char * nick;
+};
+
 struct ReturnParserData
 {
 	bool parsed;
@@ -35,13 +46,19 @@ public:
 	SocketDataParser();
 	~SocketDataParser();
 
-	/* Parses data to send over network
-	 * Prepares to recive data on following object */
+	/* Parses data to send over network.
+	 * Prepares to recive data on following object. */
 	static const char * ParseDataIn(SocketObjectType objType, std::string objTag, const char * data);
 
-
+	/* Parses data back to what it was before parsing. */
 	static ReturnParserData ParseDataOut(const char * data);
 
+	/* As normal parsing but just for initial data send 
+	 * when connecting to server from client. */
+	static const char * ParseDataInitalIn(InitialData initialData);
+
+	/* Parses back to what was before ParseDataInitalIn(). */
+	static InitialData ParseDataInitalOut(const char * data);
 
 };
 

@@ -73,7 +73,7 @@ void Game::init(const char* title, int xpos, int ypos, int width, int height, bo
 		else 
 		{
 			Util::Error("Window creating: " + (std::string)SDL_GetError());
-			exit(2);
+			exit(ErrorCode_WindowCreateFail);
 		}
 
 		renderer = SDL_CreateRenderer(window, -1, 0);
@@ -84,8 +84,8 @@ void Game::init(const char* title, int xpos, int ypos, int width, int height, bo
 		} 
 		else 
 		{
-			Util::Error("Renderer createing: " + (std::string)SDL_GetError());
-			exit(3);
+			Util::Error("Renderer creating: " + (std::string)SDL_GetError());
+			exit(ErrorCode_RendererCreateFail);
 		}
 
 		running = true;
@@ -93,38 +93,39 @@ void Game::init(const char* title, int xpos, int ypos, int width, int height, bo
 	else
 	{
 		running = false;
-		Util::Error("SDL_INIT_EVERYTHING: " + (std::string)SDL_GetError());
-		exit(4);
+		Util::Error("SDL_INIT_EVERYTHING error: " + (std::string)SDL_GetError());
+		exit(ErrorCode_SDLInitAllFail);
 	}
 
 	// Initialize SDL TTF 
-	if (TTF_Init() > 0) 
+	if (/*TTF_Init() > 0*/ TTF_Init() != 0)
 	{
-		Util::Error("TTF_Init: %s\n" + (std::string)TTF_GetError());
-		exit(5);
+		Util::Error("TTF_Init: " + (std::string)TTF_GetError());
+		exit(ErrorCode_TTFInitFail);
 	} 
-	else if (TTF_Init() < 0) 
-	{
-		Util::Error("TTF_Init: %s\n" + (std::string)TTF_GetError());
-		exit(6);
-	}
+	//else if (TTF_Init() < 0) 
+	//{
+	//	Util::Error("TTF_Init: %s\n" + (std::string)TTF_GetError());
+	//	exit(6);
+	//}
 
-	// load support for the OGG and MOD sample/music formats
+	// Load support for the OGG and MOD sample/music formats
 	int mixFlags = MIX_INIT_OGG | MIX_INIT_MOD | MIX_INIT_MP3 | MIX_INIT_FLAC;
 	int initted = Mix_Init(mixFlags);
-	if (initted&mixFlags != mixFlags) {
-		Util::Error("Mix_Init: %s\n" + (std::string)Mix_GetError());
-		exit(7);
+	if (initted & mixFlags != mixFlags)
+	{
+		Util::Error("Mix_Init: " + (std::string)Mix_GetError());
+		exit(ErrorCode_MixInitFail);
 	}
 
 	// Initialize sdl mixer
 	if (Mix_OpenAudio(44100, MIX_DEFAULT_FORMAT, 2, 2048) < 0)
 	{
-		Util::Error("SDL_mixer: %s\n" + (std::string)Mix_GetError() + (std::string)SDL_GetError());
-		exit(8);
+		Util::Error("SDL_mixer: " + (std::string)Mix_GetError() + (std::string)SDL_GetError());
+		exit(ErrorCode_SDLMixInitFail);
 	}
 	
-	SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "2");
+	SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "1");
 
 	// Entity - component system manager
 	manager.game = this;
@@ -142,14 +143,14 @@ void Game::init(const char* title, int xpos, int ypos, int width, int height, bo
 	sockets = new SocketsManager(this);
 	if (server)
 	{
-		if (sockets->Listen("127.0.0.3", 62000, true))
+		if (sockets->Listen("", 62000, true))
 			Util::Debug("Listening succesfull!");
 		else
 			Util::Debug("Listening failed!");
 	}
 	else
 	{
-		if (sockets->Connect("127.0.0.2", 62000))
+		if (sockets->Connect("127.0.0.1", 62000))
 			Util::Debug("Connection succesfull!");
 		else
 			Util::Debug("Connection failed!");

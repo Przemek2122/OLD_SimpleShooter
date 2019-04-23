@@ -18,7 +18,7 @@ int SocketClientTCP::ConnectionThread(void * ptr)
 	connectionData->asyncConnection->clientTCP->mainSocket = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
 	if (connectionData->asyncConnection->clientTCP->mainSocket == INVALID_SOCKET)
 	{
-		Util::Debug("Error creating socket: " + getSockError());
+		Util::Error("Error creating socket: " + getSockError());
 		closesocket(connectionData->asyncConnection->clientTCP->mainSocket);
 
 		return false;
@@ -48,7 +48,7 @@ bool SocketClientTCP::Connect(const char * domain, unsigned short port)
 	mainSocket = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
 	if (mainSocket == INVALID_SOCKET)
 	{
-		Util::Debug("Error creating socket: " + getSockError());
+		Util::Error("Error creating socket: " + getSockError());
 		closesocket(mainSocket);
 
 		return false;
@@ -68,6 +68,22 @@ bool SocketClientTCP::Connect(const char * domain, unsigned short port)
 		return false;
 	}
 
+	// Initial send data variable
+	InitialData initalData; 
+	initalData.nick = (char *)"Przemek";
+
+	// Log 
+	Util::Debug(initalData.nick);
+
+	// Send data
+	while (true)
+		Send("Testing obviously.");
+
+	Send(SocketDataParser::ParseDataInitalIn(initalData));
+
+	SDL_Delay(2000);
+	Send("Test over network with 2000ms delay.");
+
 	return true;
 }
 
@@ -78,7 +94,6 @@ void SocketClientTCP::AsyncConnect(const char * domain, unsigned short port)
 	ConnectionData * connectionData = new ConnectionData();
 
 	thread = SDL_CreateThread(SocketClientTCP::ConnectionThread, "AsyncConnect", connectionData);
-
 }
 
 bool SocketClientTCP::IsAsyncReady()
@@ -94,23 +109,38 @@ bool SocketClientTCP::IsAsyncConnected()
 // @Todo move to thread
 void SocketClientTCP::Send(const char * data)
 {
-	int bytesSent;
-	int bytesRecv = SOCKET_ERROR;
-	char sendbuf[32] = "Client says hello!";
+#ifdef _DEBUG
+	if (!mainSocket || mainSocket == NULL)
+	{
+		Util::Error("SocketClientTCP::Send(): mainSocket is NULL.");
+		Util::Error("No data was send.");
+		return;
+	}
 
-	bytesSent = send(mainSocket, sendbuf, strlen(sendbuf), 0);
-	Util::Debug("Send: " + bytesSent);
+	if (data == NULL)
+	{
+		Util::Error("SocketClientTCP::Send(const char * data): data pointer is NULL.");
+		Util::Error("No data was send.");
+		return;
+	}
+#endif 
+
+	// Send data
+	int bytesSent = send(mainSocket, data, strlen(data), 0);
+
+	// Debug
+	Util::Debug("Send: " + std::to_string(bytesSent) + " bytes.");
 }
 
 // @Todo move to thread
 char * SocketClientTCP::Recive()
 {
 	int bytesRecv = SOCKET_ERROR;
-	char recvbuf[32] = "";
+	char recvbuf[128] = "";
 
-	bytesRecv = recv(mainSocket, recvbuf, 32, 0);
-	Util::Debug("Bytes received: " + bytesRecv);
-	Util::Debug("Received text: " + (std::string)recvbuf);
+	bytesRecv = recv(mainSocket, recvbuf, 128, 0);
+	std::cerr << "Bytes received: " << std::to_string(bytesRecv) << std::endl;
+	std::cerr << "Received text: " << recvbuf << std::endl;
 
 	return nullptr;
 }

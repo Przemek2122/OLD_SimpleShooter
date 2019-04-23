@@ -2,10 +2,18 @@
 #include "SocketServer.h"
 #include "SDL.h"
 #include <atomic>
-#include <vector>
+//#include <vector>
+#include <array>
+#include <bitset>
 #include <map>
 
+
+#define SOCKETDATABUFFER 256
+
+class TCPHandler;
 class TCPAcceptManager;
+class SocketServerTCP;
+
 
 /* Used when creating thread to pass data. */
 struct InAcceptData
@@ -19,21 +27,33 @@ struct InAcceptData
 	bool anyAddress;
 };
 
-class SocketServerTCP;
-
 /* Class for handling tcp connection to client. 
  * Send / Recive data etc.
  * General operation on socket.
  * Everything in separate thread. */
 class TCPHandler
 {
+public:
 	TCPHandler(SocketServerTCP * srvTCP, SOCKET * accptSock);
 	~TCPHandler();
 
-	static int Thread(void * ptr);
+	static int TCPHandle(void * ptr);
+
+	void Stop();
+
+	void Send(char * data, std::string client);
+
+	char * Recive();
+
+	bool HandleErrors();
+
+	bool keepReciving;
 
 	SocketServerTCP * sockSrvTCP;
-	SOCKET * sock;
+
+	SOCKET sock;
+
+	SDL_Thread *thread;
 
 };
 
@@ -54,31 +74,37 @@ private:
 };
 
 /* Class manages TCP on server.
- * Call Listen to start listening on thread. */
+ * Call Listen() to start listening on thread. */
 class SocketServerTCP : public SocketServer
 {
 public:
 	SocketServerTCP(std::string tag);
 	~SocketServerTCP();
 
+	/* Class for thread accepting new connections. */
 	TCPAcceptManager * tcpAccept;
 
-	/* Vector with connected sockets. */
-	std::vector < std::unique_ptr < SOCKET > > sockets;
+	/* Map with classes containg tcp handling class and each it's thread. */
+	std::map< TCPHandler*, std::string > clientTCPHandlers;
 
-	//std::map < TCPHandler, std::string > clientSocketsTCP;
-
-
+	/* Thread for accepting new connection */
 	static int AcceptThread(void * ptr);
 
 	/* Starts listening */
 	bool Listen(const char * domain, unsigned short port, bool allAdresses);
 
-	void Send(char * data);
+	/* Stops listening (accepting)
+	 * Then disable all threads handling tcp connections. */
+	void Stop();
 
+	/* Send data over */
+	void Send(char * data, std::string client);
+
+	/* Recive data */ 
 	char * Recive();
 
 private:
+	/* Thread for accept (listen) */
 	SDL_Thread *thread;
 
 };
