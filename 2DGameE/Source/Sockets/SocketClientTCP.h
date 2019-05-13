@@ -49,7 +49,7 @@ public:
 	/* Was async connection sucessfull? Or not? */
 	bool IsAsyncConnected();
 
-	void Send(const char * data);
+	void Send(char * data);
 
 	char * Recive();
 

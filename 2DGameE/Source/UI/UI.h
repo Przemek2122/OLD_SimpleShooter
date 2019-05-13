@@ -5,7 +5,8 @@
 
 class UIManager;
 
-namespace UIUtil {
+namespace UIUtil
+{
 	int getWindowWidth();
 	int getWindowHeight();
 	int getScreenPercentW(int p);
@@ -17,8 +18,8 @@ class Widget {
 public:
 	UIManager * uiManager;
 
-	virtual void init() {}
-	virtual void postInit() {}
+	virtual void init() {}/*
+	virtual void postInit() {}*/
 	virtual void update() {}
 	virtual void render() {}
 
@@ -45,13 +46,14 @@ public:
 	void update();
 	void render();
 
+	bool isThereWidgetWithID(std::string id);
+
 	template<typename T>
 	T& getWidget(std::string id)
 	{
 		// Check if exists
-		// TODO
+		// @TODO
 
-		//if (Widgets[id] != nullptr)
 		return *static_cast<T*>(Widgets[id]);
 	}
 
@@ -59,7 +61,6 @@ public:
 	T& addWidget(std::string id, TArgs && ...mArgs)
 	{
 		// Check if not exists
-		// TODO
 
 		T* t(new T(std::forward<TArgs>(mArgs)...));
 
@@ -68,9 +69,23 @@ public:
 		return *t;
 	}
 
+	//template<typename T, typename ...TArgs>
+	//T& ensureWidget(std::string id, TArgs && ...mArgs)
+	//{
+	//	// Check if exists
+	//	if (isThereWidgetWithID(id))
+	//	{
+	//		return *static_cast<T*>(Widgets[id]);
+	//	}
+	//	else
+	//	{
+	//		addWidget<T>(id, mArgs);
+	//	}
+	//}
+
 	bool destroyWidget(std::string id)
 	{
-		// Check if exists
+		// Check if exists (if needed)
 		// TODO
 
 		Widgets.erase(id);

@@ -52,8 +52,6 @@ Game::~Game(){}
 
 void Game::init(const char* title, int xpos, int ypos, int width, int height, bool fullscreen)
 {
-	Util::LogInit(true);
-
 	int flags = 0;
 	if (fullscreen)
 	{
@@ -103,11 +101,6 @@ void Game::init(const char* title, int xpos, int ypos, int width, int height, bo
 		Util::Error("TTF_Init: " + (std::string)TTF_GetError());
 		exit(ErrorCode_TTFInitFail);
 	} 
-	//else if (TTF_Init() < 0) 
-	//{
-	//	Util::Error("TTF_Init: %s\n" + (std::string)TTF_GetError());
-	//	exit(6);
-	//}
 
 	// Load support for the OGG and MOD sample/music formats
 	int mixFlags = MIX_INIT_OGG | MIX_INIT_MOD | MIX_INIT_MP3 | MIX_INIT_FLAC;
@@ -129,12 +122,13 @@ void Game::init(const char* title, int xpos, int ypos, int width, int height, bo
 
 	// Entity - component system manager
 	manager.game = this;
-
-	// Audio 
-	audioManager = new AudioManager;
+	ECSManager = &manager;
 
 	// UI
 	UiManager = new UIManager(this);
+
+	// Audio 
+	audioManager = new AudioManager;
 
 	// Map (will generate anything too...)
 	map = new Map(this);
@@ -163,6 +157,7 @@ void Game::init(const char* title, int xpos, int ypos, int width, int height, bo
 	// Player
 	Player.addComponent<PlayerComponent>();
 	player = &Player;
+	//Player.considerNetwork = true;
 
 	// Test enemy(s)
 	Enemy.addComponent<EnemyComponent>();
@@ -210,7 +205,7 @@ void Game::update()
 	map->updateCollision();
 	manager.update();
 	UiManager->update();
-	sockets->Update();
+	sockets->update();
 
 	// FPS Counter
 	if (checkFPS)

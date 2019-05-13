@@ -47,3 +47,15 @@ void UIManager::render()
 		if (widget.second->isRenderEnabled())
 			widget.second->render();
 }
+
+bool UIManager::isThereWidgetWithID(std::string id)
+{
+	if (Widgets.find("f") == Widgets.end()) {
+		// Not found
+		return false;
+	}
+	else {
+		// Found
+		return true;
+	}
+}

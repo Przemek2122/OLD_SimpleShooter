@@ -8,6 +8,8 @@ bool FPSLimitEnabled = true;
 
 int main(int argc, char * argv[])
 {
+	Util::LogInit(true);
+
 	game = new Game();
 
 	Util::Info("Command line arguments:");

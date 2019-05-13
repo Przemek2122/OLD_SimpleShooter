@@ -12,7 +12,7 @@ SocketsManager::~SocketsManager()
 	Socket::sockQuit();
 }
 
-void SocketsManager::Update()
+void SocketsManager::update()
 {
 	
 }
@@ -31,7 +31,7 @@ bool SocketsManager::Listen(const char * domain, unsigned short port, bool allAd
 {
 	// Create new if invalid
 	if (!socketServerTCP)
-		socketServerTCP = new SocketServerTCP("server");
+		socketServerTCP = new SocketServerTCP("server", game);
 
 	// Start listening
 	return socketServerTCP->Listen(domain, port, allAdresses);

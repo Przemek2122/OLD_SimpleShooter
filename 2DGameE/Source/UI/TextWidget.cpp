@@ -41,11 +41,17 @@ void TextWidget::set(int x, int y, std::string text, std::string font, SDL_Color
 	SDL_FreeSurface(textSurface);
 }
 
-// Use after adding UIText and init(), this function changes text and font
+// Use after adding UIText, this function changes text and font
 void TextWidget::setText(std::string text, std::string font) 
 {
 	// Make sure this text exists
-	// TBF
+#ifdef _DEBUG
+	if (this == NULL)
+	{
+		Util::Error("Text widget doesn't exists!");
+		return;
+	}
+#endif
 
 	SDL_Surface * textSurface = TTF_RenderText_Blended(Game::assets->getFont(font), text.c_str(), textColor);
 	SDL_LockSurface(textSurface); // Lock surface for safe pixel acces

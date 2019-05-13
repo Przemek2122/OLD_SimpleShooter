@@ -2,6 +2,16 @@
 #include "Util.h"
 
 
+InitialData::InitialData(){}
+
+InitialData::InitialData(char * mNick)
+	: nick(mNick) {}
+
+ReturnParserData::ReturnParserData() {}
+
+ReturnParserData::ReturnParserData(bool mParsed, SocketObjectType mObjectType, std::string mData)
+	: parsed(mParsed), objType(mObjectType), data(mData) {}
+
 
 SocketDataParser::SocketDataParser()
 {}
@@ -9,107 +19,126 @@ SocketDataParser::SocketDataParser()
 SocketDataParser::~SocketDataParser()
 {}
 
-const char * SocketDataParser::ParseDataIn(SocketObjectType objType, std::string objTag, const char * data)
+std::string SocketDataParser::ParseDataIn(SocketObjectType objType, std::string objTag, const char * data)
 {
-	// Convert to int
-	int type = static_cast<int>(objType);
-	
 	// Prepare
-	std::string dataToSend = /*SocketDataStart +*/
-		(char *)SocketDataStart
-		+ (char)type + SocketDataSeparator
-		+ (char)objTag.c_str() + SocketDataSeparator
-		+ *data + SocketDataEnd;
+	std::string dataToSend = "";
 
-	// Debug
+	dataToSend.append(SocketDataAuto);
+	dataToSend.append(std::to_string(objType));
+	dataToSend.append(SocketDataSeparator);
+	dataToSend.append(objTag);
+	dataToSend.append(SocketDataSeparator);
+	dataToSend.append(data);
+
+#ifdef _DEBUG
 	Util::Debug("Parsed data: " + dataToSend);
+#endif 
 
-	return dataToSend.c_str();
+	return dataToSend;
 }
 
 ReturnParserData SocketDataParser::ParseDataOut(const char * data)
 {
-	// Not parsed by SocketDataParser if true
-	// Warning if true may be not parsed too.
-	char * sockDataStart = (char *)SocketDataStart;
-	for (int t = 0; t < strlen(sockDataStart); t++)
+	// Not parsed by SocketDataParser if true.
+	// Warning: If true may be not parsed too.
+	int i = 0;
+	for (; i < strlen(SocketDataAuto); i++)
 	{
 		// If true anytime then it's not parsed.
-		if (data[t] != sockDataStart[t])
+		if (data[i] != SocketDataAuto[i])
 		{
-			ReturnParserData returnError;
-			returnError.parsed = false, returnError.objType = SocketObjectType(0), returnError.data = data;
-			return returnError;
+			return ReturnParserData(false, SocketObjectType(0), data);
 		}
 	}
 
 	// Get SocketObjectType
 	std::string objTypeData = "";
-	bool stillObjType = true;
-	int i = 1; // data[0] must be A then start from 1
-	char * sockDataSepr = (char *)SocketDataSeparator;
-	while (stillObjType)
+	bool keepRunning = true;
+	while (keepRunning)
 	{
+		// Check if it's not SocketDataSeparator
+		if (data[i] == SocketDataSeparator[0])
+		{
+			size_t size = strlen(SocketDataSeparator);
+
+			// Then check rest
+			for (int t = 1; t <= size; t++)
+			{
+				if (data[i + t] <= size)
+				{
+					if (data[i + t] != SocketDataSeparator[t])
+					{
+						// Stop checking if it's different
+						break;
+					}
+				}
+				else
+				{
+					// Stop objtype
+					keepRunning = false;
+					// Set current char index to be after SocketDataSeparator
+					i += t;
+					break;
+				}
+			}
+		}
+
+		// If not then add
 		objTypeData += data[i];
 
-		if (data[i] != sockDataSepr[0] && data[i + 1] != sockDataSepr[1])
-			stillObjType = false;
-
+		// Next
 		i++;
 	}
 
 	// Get SocketObjectTag
 	std::string objTypeTag = "";
-	stillObjType = true;
-	i = 1; // data[0] must be A then start from 1
-	while (stillObjType)
+	keepRunning = true;
+	while (keepRunning)
 	{
-		objTypeData += data[i];
+		objTypeTag += data[i];
 
-		if (data[i] != sockDataSepr[0] && data[i + 1] != sockDataSepr[1])
-			stillObjType = false;
+		// Check if it's not SocketDataSeparator
+		if (data[i] == SocketDataSeparator[0])
+		{
+			size_t size = strlen(SocketDataSeparator);
+
+			// Then check rest
+			for (int t = 1; t <= size; t++)
+			{
+				if (data[i + t] <= size)
+				{
+					if (data[i + t] != SocketDataSeparator[t])
+					{
+						// Stop checking if it's different
+						continue;
+					}
+				}
+				else
+				{
+					// Stop objtype
+					keepRunning = false;
+					// Set current char index to be after SocketDataSeparator
+					i += t + 1;
+					break;
+				}
+			}
+		}
 
 		i++;
 	}
 
 	// Convert a objTypeData to int and make SocketObjectType
 	SocketObjectType objType = SocketObjectType(atoi(objTypeData.c_str()));
-	switch (objType)
-	{
-	case SOCKETOBJECT_CUSTOM:
-		Util::Debug("Found SOCKETOBJECT_CUSTOM!");
-		break;
 
-	case SOCKETOBJECT_INITIAL:
-		Util::Debug("Found SOCKETOBJECT_INITIAL!");
-		ReturnParserData parserData;
-		parserData.parsed = true;
-		parserData.objType = objType;
-		parserData.data = "Not finished.";
-		return parserData;
-		break;
+	// @TODO - Remove unwanted part
+	std::string newData(data);
 
-	case SOCKETOBJECT_ENTITY:
-		Util::Debug("Found SOCKETOBJECT_ENTITY!");
-		break;
-
-	case SOCKETOBJECT_COMPONENT:
-		Util::Debug("Found SOCKETOBJECT_COMPONENT!");
-		break;
-
-	default:
-		Util::Debug("Unable to find SocketObjectType: " + objType + (std::string)" With data: " + objTypeData);
-		break;
-	}
-
-	// Should happend only when switch end at default...
-	ReturnParserData returnError;
-	returnError.parsed = false, returnError.objType = SocketObjectType(0), returnError.data = data;
-
-	return returnError;
+	// Return edited.
+	return ReturnParserData(true, objType, newData.substr(i));
 }
 
-const char * SocketDataParser::ParseDataInitalIn(InitialData initialData)
+std::string SocketDataParser::ParseDataInitalIn(InitialData initialData)
 {
 	char * data;
 
@@ -125,3 +154,4 @@ InitialData SocketDataParser::ParseDataInitalOut(const char * data)
 
 	return initialData;
 }
+

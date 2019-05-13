@@ -76,13 +76,10 @@ bool SocketClientTCP::Connect(const char * domain, unsigned short port)
 	Util::Debug(initalData.nick);
 
 	// Send data
-	while (true)
-		Send("Testing obviously.");
-
-	Send(SocketDataParser::ParseDataInitalIn(initalData));
+	Send((char *)SocketDataParser::ParseDataInitalIn(initalData).c_str());
 
 	SDL_Delay(2000);
-	Send("Test over network with 2000ms delay.");
+	Send((char *)"Test over network with 2000ms delay.");
 
 	return true;
 }
@@ -107,7 +104,7 @@ bool SocketClientTCP::IsAsyncConnected()
 }
 
 // @Todo move to thread
-void SocketClientTCP::Send(const char * data)
+void SocketClientTCP::Send(char * data)
 {
 #ifdef _DEBUG
 	if (!mainSocket || mainSocket == NULL)
@@ -116,10 +113,9 @@ void SocketClientTCP::Send(const char * data)
 		Util::Error("No data was send.");
 		return;
 	}
-
 	if (data == NULL)
 	{
-		Util::Error("SocketClientTCP::Send(const char * data): data pointer is NULL.");
+		Util::Error("data variable is nullptr.");
 		Util::Error("No data was send.");
 		return;
 	}

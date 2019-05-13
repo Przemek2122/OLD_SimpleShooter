@@ -39,7 +39,7 @@ public:
 	static AssetsManager* assets;
 
 	SocketsManager * sockets;
-	Manager * ECSmanager;
+	Manager * ECSManager;
 	UIManager * UiManager;
 	AudioManager * audioManager;
 	Map* map;

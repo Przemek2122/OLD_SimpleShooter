@@ -35,7 +35,7 @@ public:
 	std::map < SocketClientTCP, std::string > clientSocketsTCP;
 
 	/* Check for incoming connections etc... */
-	void Update();
+	void update();
 
 	/* Attempts to connect with
 	 * server at @domain with @port

@@ -2,8 +2,8 @@
 #include "Util.h"
 #include "SocketDataParser.h"
 #include <memory>
-
-
+#include "Game.h"
+#include "Components/ECS.h"
 
 
 InAcceptData::InAcceptData() {}
@@ -12,7 +12,8 @@ InAcceptData::InAcceptData(TCPAcceptManager * mTcpAcceptManager, unsigned int mP
 	: tcpAcceptManager(mTcpAcceptManager), port(mPort), address(mAddress), anyAddress(anyAddr) {}
 
 
-TCPHandler::TCPHandler(SocketServerTCP * srvTCP, SOCKET * accptSock) : sockSrvTCP(srvTCP), sock(*accptSock)
+TCPHandler::TCPHandler(SocketServerTCP * srvTCP, SOCKET * accptSock, Game * mGame)
+	: sockSrvTCP(srvTCP), sock(*accptSock), game(mGame)
 {
 	keepReciving = true;
 }
@@ -44,56 +45,56 @@ int TCPHandler::TCPHandle(void * ptr)
 	Util::startDelay(lastMS);
 
 	// Loop
-	while (/*tcpHandler->tcpHandler->keepReciving*/ true)
+	while (tcpHandler->keepReciving)
 	{
 		if (Util::isDelayed(lastMS, delayMS))
 		{
 			// Debug errors
-			/*tcpHandler->tcpHandler->HandleErrors();*/
-
-			int error = SocketServerTCP::getSockError();
-
-			Util::Info("Socket error: " + std::to_string(error));
+			tcpHandler->HandleErrors();
 
 			// Delay next check
 			Util::startDelay(lastMS);
 		}
 
-		/*const char * recivedData = tcpHandler->tcpHandler.get()->Recive();
-		if (recivedData != "")
+		std::string recived = tcpHandler->Recive();
+		if (recived != "")
 		{
-			ReturnParserData parserData = SocketDataParser::ParseDataOut(recivedData);
-			if (parserData.parsed)
+			ReturnParserData rData = SocketDataParser::ParseDataOut(recived.c_str());
+			if (rData.parsed)
 			{
-				switch (parserData.objType)
+				switch (rData.objType)
 				{
 				case SOCKETOBJECT_INITIAL:
-					Util::Info(parserData.data);
+					Util::Info("Initial data: " + (std::string)rData.data);
 					break;
 
 				default:
-					Util::Error("TCPHandler::TCPHandle(): switch: Unknown data type.");
+					Util::Warning("Got sth parsed. But unhandled yet.");
 					break;
 				}
 			}
 			else
 			{
-				Util::Error("TCPHandler::TCPHandle(): Data is not parsed.");
-				Util::Error("Got: " + (std::string)recivedData);
+				Util::Warning("Unparsed. Got: " + recived);
 			}
-		}*/
-
-		int bytesRecv = SOCKET_ERROR;
-		char recvbuf[128] = "";
-
-		bytesRecv = recv(tcpHandler->sock, recvbuf, 128, 0);
-		if (bytesRecv > 0)
-		{
-			Util::Debug("Bytes received: " + bytesRecv);
-			Util::Debug("Received text: " + (std::string)recvbuf);
 		}
 
-		SDL_Delay(100);
+#ifdef _DEBUG
+		if (tcpHandler->game->ECSManager == NULL)
+			Util::Debug("TCPHandle(): tcpHandler->game->ECSManager is NULL.");
+		if (tcpHandler->game == NULL)
+			Util::Debug("TCPHandle(): tcpHandler->game is NULL.");
+#endif
+
+		//for (auto & e : tcpHandler->game->ECSManager->entities)
+		//{
+		//	if (e->considerNetwork)
+		//	{
+		//		Util::Debug("Found network considered.");
+		//	}
+		//}
+
+		SDL_Delay(50);
 	}
 
 	return 0;
@@ -102,92 +103,174 @@ int TCPHandler::TCPHandle(void * ptr)
 void TCPHandler::Stop()
 {
 	keepReciving = false;
+	SocketServerTCP::sockClose(sock);
 	SDL_DetachThread(thread);
 }
 
 void TCPHandler::Send(char * data, std::string client)
 {
-	int bytesSent;
+#ifdef _DEBUG
+	if (!sock || sock == NULL)
+	{
+		Util::Error("SocketClientTCP::Send(): mainSocket is invalid or NULL.");
+		Util::Error("No data was send. - Debug only.");
+		return;
+	}
 
-	bytesSent = send((SOCKET)sock, data, strlen(data), 0);
+	if (data == NULL)
+	{
+		Util::Error("SocketClientTCP::Send(const char * data): data pointer is NULL.");
+		Util::Error("No data was send. - Debug only.");
+		return;
+	}
+#endif 
 
-	Util::Debug("Send: " + bytesSent);
+	// Add start and end to the data
+	std::string dataString;
+	dataString.append(SocketDataStart);
+	dataString.append(data);
+	dataString.append(SocketDataEnd);
+
+#ifdef _DEBUG
+	// Log debug data. (Characters which will be attempted to send.)
+	Util::Debug("Attempting to send: " + dataString);
+#endif
+
+	// Send data
+	int bytesSent = send(sock, dataString.c_str(), strlen(dataString.c_str()), 0);
+
+#ifdef _DEBUG
+	// Log debug data. (Ammount of send bytes.)
+	Util::Debug("Send: " + std::to_string(bytesSent) + " bytes.");
+#endif
 }
 
-char * TCPHandler::Recive()
+std::string TCPHandler::Recive()
 {
 #ifdef _DEBUG
-	if (this == NULL) // seriously was null and function almost worked.
+	if (!sock)
 	{
-		Util::Debug("TCPHandler::ReciveLoop(): this is NULL.");
-		return (char *)"error";
-	}
-	if ((SOCKET)&sock == NULL)
-	{
-		Util::Debug("TCPHandler::ReciveLoop(): (SOCKET)&sock is NULL.");
-		return (char *)"error";
-	}
-	if (!(SOCKET)&sock)
-	{
-		Util::Debug("TCPHandler::ReciveLoop(): (SOCKET)&sock is not valid.");
-		return (char *)"error";
+		Util::Debug("TCPHandler::ReciveLoop(): sock is not valid.");
+		return (char *)"Error. sock invalid";
 	}
 #endif
 
-	// Buffer for recived data.
-	int bytesRecv = SOCKET_ERROR;
-	char recvbuf[SOCKETDATABUFFER];
+	// Total data
+	int * totalRecv = 0;
+	std::string totalbuf = "";
 
-	bool run = true;
-	
-	// Buffer for total recived data. 
-	// Recived as long as there is something to recive.
-	char * newData = (char *)"";
+	// Is running loop?
+	bool readNewData = true;
 
-	while (run)
+	// Recive loop
+	while (readNewData)
 	{
-		bytesRecv = recv((SOCKET)&sock, recvbuf, SOCKETDATABUFFER, 0);
+		// Current recv data
+		int bytesRecv = SOCKET_ERROR;
+		char recvbuf[SOCKETDATABUFFER];
 
-		// If there is at least one byte
-		// otherwise there is no point on doing anything
-		// as no data was recived
+		// Get
+		bytesRecv = recv(sock, recvbuf, SOCKETDATABUFFER, 0);
+
+		// Is there any data?
+		// If condition is true then there isn't and there is no point of doing anything
 		if (bytesRecv <= 0)
 		{
-			return (char *)"";
+#ifdef _DEBUG
+			Util::Debug("No data recived in recv.");
+#endif
+			return "";
 		}
 
-		// For each character in recvbuf
-		unsigned int size = sizeof(recvbuf);
-		for (int i = 0; i < size; i++)
+		// Start char buffer index
+		size_t i = 0;
+
+		bool keepStartFinding = true;
+
+		// Find start (Seems complicated but it's not)
+		size_t dartStartSize = strlen(SocketDataStart);
+		while (i < SOCKETDATABUFFER && keepStartFinding)
 		{
-			// If socket data end is not reached
-			if (recvbuf[i] != SocketDataEnd)
+			// If SocketDataStart first char
+			if (recvbuf[i] == SocketDataStart[0])
 			{
-				// Add data to new data
-				newData += recvbuf[i];
+				// Check rest
+				for (int t = 1; t <= dartStartSize; t++)
+				{
+					// For each socket data start sequence chars
+					if (recvbuf[i + t] != SocketDataStart[t] || recvbuf[i + t] > SOCKETDATABUFFER)
+					{
+						// Stop checking if it's different
+						keepStartFinding = false;
+						i += dartStartSize - 1;
+						break;
+					}
+				}
 			}
-			else
+
+			i++;
+		}
+
+		// For each character (Also seems complicated but it's not)
+		for (i; i < SOCKETDATABUFFER; i++)
+		{
+			// If SocketDataEnd first char
+			if (recvbuf[i] == SocketDataEnd[0])
 			{
-				// Stop checking for new data as end of data was found
-				run = false;
-
-				// Log as debug recived text
-				std::cerr << "Recived text: " << newData << std::endl;
-
-				// Return recived data
-				return newData;
+				// Check rest
+				for (int t = 1; t <= strlen(SocketDataEnd); t++)
+				{
+					// For each socket data end sequence chars
+					if (recvbuf[i + t] != SocketDataEnd[t] || recvbuf[i + t] > SOCKETDATABUFFER)
+					{
+						// Stop checking if it's different
+						break;
+					}
+					else
+					{
+						// Stop
+						readNewData = false;
+#ifdef _DEBUG
+						// Log
+						Util::Debug("Recived text: " + totalbuf);
+#endif
+						// Return what's recived
+						return totalbuf.c_str();
+					}
+				}
 			}
+
+			// If not ended
+			std::string s (1, recvbuf[i]);
+			totalbuf.append(s); 
 		}
 	}
 }
 
-bool TCPHandler::HandleErrors()
+int TCPHandler::HandleErrors()
 {
+	// Get error
 	int error = SocketServerTCP::getSockError();
 
-	Util::Info("Socket error: " + std::to_string(error));
+	// No error
+	if (error == 0) return error;
 
-	return false;
+	// Handle errors
+	switch (error)
+	{
+	case 10054:
+		Util::Info("Socket 10054: Socket disconnected. Stopping.");
+		Stop();
+		break;
+
+	case 10038:
+		Util::Info("Socket 10038: Some operation was attempted on invalid socket.");
+		break;
+
+	default:
+		Util::Info("Unhandled socket error: " + std::to_string(error));
+		return error;
+	}
 }
 
 
@@ -200,8 +283,8 @@ TCPAcceptManager::~TCPAcceptManager()
 {}
 
 
-SocketServerTCP::SocketServerTCP(std::string tag) : SocketServer(tag)
-{}
+SocketServerTCP::SocketServerTCP(std::string tag, Game * mGame) 
+	: SocketServer(tag), game(mGame) {}
 
 SocketServerTCP::~SocketServerTCP()
 {
@@ -288,10 +371,12 @@ int SocketServerTCP::AcceptThread(void * ptr)
 #ifdef _DEBUG
 		if (!acceptSocket)
 			Util::Debug("SocketServerTCP::AcceptThread(): acceptSocket is invalid.");
+		if (TcpAcceptManager->SockSrvTCP->game == NULL)
+			Util::Debug("SocketServerTCP::AcceptThread(): TcpAcceptManager->SockSrvTCP->game is NULL.");
 #endif
 
 		// Connection handler
-		TCPHandler * tcpHandler = new TCPHandler(TcpAcceptManager->SockSrvTCP, &acceptSocket);
+		TCPHandler * tcpHandler = new TCPHandler(TcpAcceptManager->SockSrvTCP, &acceptSocket, TcpAcceptManager->SockSrvTCP->game);
 
 		// Add to clientTCPHandlers
 		TcpAcceptManager->SockSrvTCP->clientTCPHandlers.emplace(tcpHandler, "test");
@@ -302,19 +387,6 @@ int SocketServerTCP::AcceptThread(void * ptr)
 
 		// Log successfully connected client.
 		Util::Info("Client connected succesfully.");
-
-		//while (true)
-		//{
-		//	int bytesRecv = SOCKET_ERROR;
-		//	char recvbuf[128] = "";
-
-		//	bytesRecv = recv(acceptSocket, recvbuf, 128, 0);
-		//	if (bytesRecv > 0 && recvbuf[0] != NULL)
-		//	{
-		//		Util::Debug("Bytes received: " + bytesRecv);
-		//		Util::Debug("Received text: " + (std::string)recvbuf);
-		//	}
-		//}
 	}
 
 	return false;

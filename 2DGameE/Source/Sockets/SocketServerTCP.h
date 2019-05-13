@@ -2,14 +2,12 @@
 #include "SocketServer.h"
 #include "SDL.h"
 #include <atomic>
-//#include <vector>
-#include <array>
-#include <bitset>
 #include <map>
 
 
 #define SOCKETDATABUFFER 256
 
+class Game;
 class TCPHandler;
 class TCPAcceptManager;
 class SocketServerTCP;
@@ -34,7 +32,7 @@ struct InAcceptData
 class TCPHandler
 {
 public:
-	TCPHandler(SocketServerTCP * srvTCP, SOCKET * accptSock);
+	TCPHandler(SocketServerTCP * srvTCP, SOCKET * accptSock, Game * mGame);
 	~TCPHandler();
 
 	static int TCPHandle(void * ptr);
@@ -43,9 +41,13 @@ public:
 
 	void Send(char * data, std::string client);
 
-	char * Recive();
+	/* Reads data (As long as there is any)
+	 * Skips any data before SocketDataStart chars sequence and
+	 * Skips any data after SocketDataEnd.
+	 * It shouldn't happen usualy but if there is some kind of error then that may happen. */
+	std::string Recive();
 
-	bool HandleErrors();
+	int HandleErrors();
 
 	bool keepReciving;
 
@@ -54,6 +56,8 @@ public:
 	SOCKET sock;
 
 	SDL_Thread *thread;
+
+	Game * game;
 
 };
 
@@ -78,13 +82,15 @@ private:
 class SocketServerTCP : public SocketServer
 {
 public:
-	SocketServerTCP(std::string tag);
+	SocketServerTCP(std::string tag, Game * mGame);
 	~SocketServerTCP();
+
+	Game * game;
 
 	/* Class for thread accepting new connections. */
 	TCPAcceptManager * tcpAccept;
 
-	/* Map with classes containg tcp handling class and each it's thread. */
+	/* Map with classes containg tcp handling class. */
 	std::map< TCPHandler*, std::string > clientTCPHandlers;
 
 	/* Thread for accepting new connection */

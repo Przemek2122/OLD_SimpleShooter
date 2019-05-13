@@ -6,10 +6,33 @@
 #include <chrono>
 #include <filesystem> // or #include <experimental/filesystem> // for creating directory in LogInit()
 
+
 #if defined(_WIN32) || defined(_WIN64)
 #include <Windows.h>
 #endif
 
+
+void SafeQueue::safePush(const Message & value)
+{
+	while (!m_mutex.try_lock())
+	{
+		SDL_Delay(1);
+	}
+
+	m_queque.push(value);
+	m_mutex.unlock();
+}
+
+void SafeQueue::safePop()
+{
+	while (!m_mutex.try_lock())
+	{
+		SDL_Delay(1);
+	}
+
+	m_queque.pop();
+	m_mutex.unlock();
+}
 
 namespace Util
 {
@@ -19,9 +42,10 @@ namespace Util
 	std::string logPrefix = "log_";
 	std::string logFilePath = logDir + "/" + logPrefix + GetCurrentTimeNoSpecial();
 
-	/* Call before calling logging functions.
-	 * It will don't create any error otherwise
-	 * but will don't log anthing to file. */
+	bool keepLogging = true;
+	SDL_Thread *thread;
+	SafeQueue messagesQueue;
+
 	void LogInit(bool enableLogging, int logLevel)
 	{
 		// @TODO - Create directory error if doesn't exist (Windows only)
@@ -47,7 +71,7 @@ namespace Util
 			Util::Warning("Creating directory on linux isn't implemented yet. Please create one or log will don't be created");
 #endif
 			isLoggingEnabled = true;
-			Util::Info("Logging to: " + logFilePath);
+			std::cout << "Logging to: " << logFilePath << std::endl;
 		}
 		else
 		{
@@ -55,6 +79,58 @@ namespace Util
 		}
 
 		loggingLevel = logLevel;
+
+		SDL_CreateThread(MessagesPrinter, "Log", (void *)NULL);
+	}
+
+	static int MessagesPrinter(void * ptr)
+	{
+		while (keepLogging) 
+			if (messagesQueue.m_queque.size() <= 0)
+			{ 
+				SDL_Delay(2);
+			}
+			else
+			{
+				switch (messagesQueue.m_queque.front().type)
+				{
+				case Message_Info:
+					PrintToConsole(messagesQueue.m_queque.front().text, 7);
+					break;
+
+				case Message_Debug:
+#ifdef _DEBUG
+					PrintToConsole(messagesQueue.m_queque.front().text, 5);
+#endif // _DEBUG
+					break;
+
+				case Message_Warning:
+					PrintToConsole(messagesQueue.m_queque.front().text, 6);
+					break;
+
+				case Message_Error:
+					PrintToConsole(messagesQueue.m_queque.front().text, 4);
+					break;
+
+				default:
+					// Should be impossible (infinite loop may happen)
+					
+					break;
+				}
+
+				if (isLoggingEnabled)
+				{
+					std::ofstream LogFile;
+					LogFile.open(logFilePath, std::ios_base::app);
+					LogFile << messagesQueue.m_queque.front().text << std::endl;
+					LogFile.close();
+				}
+
+				// Remove item
+				messagesQueue.safePop();
+			}
+
+		return 0;
 	}
 
 	/* Return current Milisecond */
@@ -69,18 +145,14 @@ namespace Util
 		startMs = GetMiliseconds();
 	}
 
-	/* Use this to check pass startMs 
-	 * (start with startDelay() first!)
-	 * delayMs is refernce for performance */
 	bool isDelayed(long long int &startMs, long int &delayMs)
 	{
 		if (GetMiliseconds() >= startMs + delayMs)
 			return true;
-		// else
+
 		return false;
 	}
 
-	/* Return simple rawtime */
 	time_t GetRawtime()
 	{
 		time_t rawtime;
@@ -91,9 +163,6 @@ namespace Util
 		return rawtime;
 	}
 	
-	/* Returns current time in format: 
-	 * day_month_year_hour_minute_second 
-	 * eg: 6_04_2018_11_7_59 */
 	std::string GetCurrentTimeNoSpecial() 
 	{
 		std::string MonthTable[12] = { "01", "02", "03", "04", "05", "06", "07", "08", "09", "10", "11", "12" };
@@ -109,8 +178,6 @@ namespace Util
 		return ctm;
 	}
 
-	/* Returns current time in format:
-	 *  */
 	std::string GetCurrTime() 
 	{
 		std::string MonthTable[12] = { "01", "02", "03", "04", "05", "06", "07", "08", "09", "10", "11", "12" };
@@ -129,59 +196,31 @@ namespace Util
 	void Info(std::string message) 
 	{
 		message = GetCurrTime() + " (Info): " + message;
-		PrintToConsole(message);
-
-		if (isLoggingEnabled)
-		{
-			std::ofstream LogFile;
-			LogFile.open(logFilePath);
-			LogFile << message << std::endl;
-			LogFile.close();
-		}
+		
+		messagesQueue.safePush({ Message_Info , message });
 	}
 
 	void Debug(std::string message) 
 	{
 #ifdef _DEBUG // if debug
 		message = GetCurrTime() + " (Debug): " + message;
-		PrintToConsole(message, 5);
 
-		if (isLoggingEnabled)
-		{
-			std::ofstream LogFile;
-			LogFile.open(logFilePath);
-			LogFile << message << std::endl;
-			LogFile.close();
-		}
+		messagesQueue.safePush({ Message_Debug , message });
 #endif
 	}
 
 	void Warning(std::string message) 
 	{
 		message = GetCurrTime() + " (Warning): " + message;
-		PrintToConsole(message, 6);
-
-		if (isLoggingEnabled)
-		{
-			std::ofstream LogFile;
-			LogFile.open(logFilePath);
-			LogFile << message << std::endl;
-			LogFile.close();
-		}
+		
+		messagesQueue.safePush({ Message_Warning , message });
 	}
 
 	void Error(std::string message) 
 	{
 		message = GetCurrTime() + " (Error): " + message;
-		PrintToConsole(message, 4);
-
-		if (isLoggingEnabled)
-		{
-			std::ofstream LogFile;
-			LogFile.open(logFilePath);
-			LogFile << message << std::endl;
-			LogFile.close();
-		}
+		
+		messagesQueue.safePush({ Message_Error , message });
 	}
 
 	void PrintToConsole(std::string &message, int color)
@@ -200,3 +239,4 @@ namespace Util
 #endif
 	}
 }
+
