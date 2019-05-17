@@ -39,6 +39,8 @@ int TCPHandler::TCPHandle(void * ptr)
 		Util::Debug("TCPHandle(): tcpHandler->sock is invalid.");
 #endif
 
+	Util::Debug("Listening from client started.");
+
 	// Delay alive checks
 	long long lastMS;
 	long delayMS = 2000;
@@ -78,13 +80,6 @@ int TCPHandler::TCPHandle(void * ptr)
 				Util::Warning("Unparsed. Got: " + recived);
 			}
 		}
-
-#ifdef _DEBUG
-		if (tcpHandler->game->ECSManager == NULL)
-			Util::Debug("TCPHandle(): tcpHandler->game->ECSManager is NULL.");
-		if (tcpHandler->game == NULL)
-			Util::Debug("TCPHandle(): tcpHandler->game is NULL.");
-#endif
 
 		//for (auto & e : tcpHandler->game->ECSManager->entities)
 		//{
@@ -260,6 +255,7 @@ int TCPHandler::HandleErrors()
 	{
 	case 10054:
 		Util::Info("Socket 10054: Socket disconnected. Stopping.");
+		// @TODO FIX, It will disable all threads at once
 		Stop();
 		break;
 

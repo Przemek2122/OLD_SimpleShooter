@@ -13,9 +13,7 @@ SocketsManager::~SocketsManager()
 }
 
 void SocketsManager::update()
-{
-	
-}
+{}
 
 bool SocketsManager::Connect(const char * domain, int port)
 {

@@ -2,7 +2,7 @@
 
 
 
-SocketClientUDP::SocketClientUDP(std::string tag) : SocketClient(tag)
+SocketClientUDP::SocketClientUDP(std::string tag) : SocketClient(tag + "_u")
 {
 }
 

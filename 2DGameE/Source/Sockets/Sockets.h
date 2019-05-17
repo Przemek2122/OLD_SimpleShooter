@@ -52,9 +52,5 @@ public:
 	that name on server (clientSocketsTCP) */
 	inline bool HasThatName(std::string name);
 
-	///* Assuming this is not server.
-	// * Will return socket with error on dedicated
-	// * Inline for performance. */
-	//inline SocketClientTCP& GetLocalSocketTCP();
 
 };

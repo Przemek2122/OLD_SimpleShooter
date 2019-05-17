@@ -39,7 +39,7 @@ int SocketClientTCP::ConnectionThread(void * ptr)
 	}
 }
 
-SocketClientTCP::SocketClientTCP(std::string tag) : SocketClient(tag){}
+SocketClientTCP::SocketClientTCP(std::string tag) : SocketClient(tag + "_t"){}
 
 SocketClientTCP::~SocketClientTCP(){}
 
@@ -119,13 +119,27 @@ void SocketClientTCP::Send(char * data)
 		Util::Error("No data was send.");
 		return;
 	}
+	Util::Debug("Send: " + (std::string)data);
 #endif 
 
-	// Send data
-	int bytesSent = send(mainSocket, data, strlen(data), 0);
+	// Add start and end to the data
+	std::string dataString;
+	dataString.append(SocketDataStart);
+	dataString.append(data);
+	dataString.append(SocketDataEnd);
 
-	// Debug
+#ifdef _DEBUG
+	// Log debug data. (Characters which will be attempted to send.)
+	Util::Debug("Attempting to send: " + dataString);
+#endif
+
+	// Send data
+	int bytesSent = send(mainSocket, dataString.c_str(), strlen(dataString.c_str()), 0);
+
+#ifdef _DEBUG
+	// Log debug data. (Ammount of send bytes.)
 	Util::Debug("Send: " + std::to_string(bytesSent) + " bytes.");
+#endif
 }
 
 // @Todo move to thread
