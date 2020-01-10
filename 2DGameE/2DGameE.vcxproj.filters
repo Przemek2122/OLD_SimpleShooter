@@ -156,6 +156,12 @@
     <ClCompile Include="Source\Sockets\SocketDataParser.cpp">
       <Filter>Source Files\Sockets</Filter>
     </ClCompile>
+    <ClCompile Include="Source\FileSystem.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Delegate.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Source\EventsHandler.h">
@@ -292,6 +298,12 @@
     </ClInclude>
     <ClInclude Include="Source\Sockets\SocketDataParser.h">
       <Filter>Header Files\Sockets</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\FileSystem.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Delegate.h">
+      <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

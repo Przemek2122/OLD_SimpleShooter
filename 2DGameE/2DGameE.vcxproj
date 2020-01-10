@@ -27,6 +27,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="Delegate.cpp" />
     <ClCompile Include="Source\AI.cpp" />
     <ClCompile Include="Source\AssetsManager.cpp" />
     <ClCompile Include="Source\AudioManager.cpp" />
@@ -45,6 +46,7 @@
     <ClCompile Include="Source\DynamicCollision.cpp" />
     <ClCompile Include="Source\CustomShapes.cpp" />
     <ClCompile Include="Source\EngineMath.cpp" />
+    <ClCompile Include="Source\FileSystem.cpp" />
     <ClCompile Include="Source\game.cpp" />
     <ClCompile Include="Source\Keyboard.cpp" />
     <ClCompile Include="Source\main.cpp" />
@@ -68,6 +70,7 @@
     <ClCompile Include="Source\Vector2D.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Delegate.h" />
     <ClInclude Include="Source\AI.h" />
     <ClInclude Include="Source\AssetsManager.h" />
     <ClInclude Include="Source\AudioManager.h" />
@@ -93,6 +96,7 @@
     <ClInclude Include="Source\ErrorCodes.h" />
     <ClInclude Include="Source\EventsHandler.h" />
     <ClInclude Include="Source\CustomShapes.h" />
+    <ClInclude Include="Source\FileSystem.h" />
     <ClInclude Include="Source\game.h" />
     <ClInclude Include="Source\Keyboard.h" />
     <ClInclude Include="Source\Map.h" />
@@ -118,41 +122,41 @@
     <VCProjectVersion>15.0</VCProjectVersion>
     <ProjectGuid>{872C3E71-8ADB-4DB4-BAB0-C4F2887A4DBA}</ProjectGuid>
     <RootNamespace>My2DGameE</RootNamespace>
-    <WindowsTargetPlatformVersion>10.0.17763.0</WindowsTargetPlatformVersion>
+    <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
     <ProjectName>SimpleShooter</ProjectName>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
-    <PlatformToolset>v141</PlatformToolset>
+    <PlatformToolset>v142</PlatformToolset>
     <CharacterSet>MultiByte</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
-    <PlatformToolset>v141</PlatformToolset>
+    <PlatformToolset>v142</PlatformToolset>
     <WholeProgramOptimization>true</WholeProgramOptimization>
     <CharacterSet>MultiByte</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
-    <PlatformToolset>v141</PlatformToolset>
+    <PlatformToolset>v142</PlatformToolset>
     <CharacterSet>MultiByte</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
-    <PlatformToolset>v141</PlatformToolset>
+    <PlatformToolset>v142</PlatformToolset>
     <WholeProgramOptimization>true</WholeProgramOptimization>
     <CharacterSet>MultiByte</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Label="Configuration" Condition="'$(Configuration)|$(Platform)'=='Dedicated|Win32'">
-    <PlatformToolset>v141</PlatformToolset>
+    <PlatformToolset>v142</PlatformToolset>
   </PropertyGroup>
   <PropertyGroup Label="Configuration" Condition="'$(Configuration)|$(Platform)'=='Dedicated|x64'">
-    <PlatformToolset>v141</PlatformToolset>
+    <PlatformToolset>v142</PlatformToolset>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
   <ImportGroup Label="ExtensionSettings">

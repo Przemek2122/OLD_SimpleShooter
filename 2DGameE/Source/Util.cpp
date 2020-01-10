@@ -4,8 +4,7 @@
 #include <fstream>
 #include "Util.h"
 #include <chrono>
-#include <filesystem> // or #include <experimental/filesystem> // for creating directory in LogInit()
-
+//#include <filesystem> // or #include <experimental/filesystem> // for creating directory in LogInit()
 
 #if defined(_WIN32) || defined(_WIN64)
 #include <Windows.h>
@@ -56,13 +55,14 @@ namespace Util
 
 // Windows check if log folder exists
 #if defined(_WIN32) || defined(_WIN64)
-			namespace fs = std::experimental::filesystem;
+			CreateDirectory(logDir.c_str(), NULL);
 
-			if (!fs::is_directory(logDir) || !fs::exists(logDir)) // Check if folder exists
-			{
-				// Create folder if not
-				fs::create_directory(logDir);
-			}
+			//namespace fs = std::experimental::filesystem;
+			//if (!fs::is_directory(logDir) || !fs::exists(logDir)) // Check if folder exists
+			//{
+			//	// Create folder if not
+			//	fs::create_directory(logDir);
+			//}
 #endif
 
 // Linux
