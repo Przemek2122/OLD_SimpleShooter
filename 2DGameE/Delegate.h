@@ -1,20 +1,30 @@
 #pragma once
 #include <vector>
 
+template<typename FunctionType = void (*)()>
 class Delegate
 {
 public:
-	/* Add new function */
-	void AddFunction(void (*func)());
+	void Delegate::AddFunction(FunctionType)
+	{
+		functions.emplace_back(func);
+	}
 
-	/* Remove function */
-	void RemoveFunction(void (*func)());
+	void Delegate::RemoveFunction(FunctionType)
+	{
+		auto iter = std::find(functions.begin(), functions.end(), func);
+		functions.erase(iter);
+	}
 
-	/* Call all stored functions */
-	void Execute();
+	void Delegate::Execute()
+	{
+		for (auto& func : functions)
+		{
+			(*func)();
+		}
+	}
 
 protected:
-	std::vector<void (*)()> functions;
+	std::vector<FunctionType> functions;
 
 };
-
