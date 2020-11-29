@@ -1,8 +1,7 @@
 #include "Util.h"
 #include "game.h"
 
-
-Game *game = nullptr;
+Game* game = nullptr;
 
 bool FPSLimitEnabled = true;
 
