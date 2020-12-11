@@ -1,12 +1,7 @@
 #pragma once
 
-#include <iostream>
-#include <string>
-#include <time.h>
-#include <conio.h>
-#include <SDL.h>
-#include <queue>
 #include <mutex>
+#include <QueueSafe.h>
 
 
 enum MessageType
@@ -21,24 +16,6 @@ struct Message
 {
 	MessageType type;
 	std::string text;
-};
-
-/* Class for safe queue.
- * Use push to safe add element at end.
- * Use pop to safe delete first element. 
- * getFront() get first element from queue.
- * getBack() get last element from queue.
- * isEmpty() USe to check if there is anything in queue. */
-struct SafeQueue
-{
-	/* Add element at end. */
-	void safePush(const Message& value);
-
-	/* Delete first element. */
-	void safePop();
-
-	std::queue<Message> m_queque;
-	mutable std::mutex m_mutex;
 };
 
 namespace Util
@@ -126,5 +103,5 @@ namespace Util
 	extern SDL_Thread *thread;
 
 	/* Queue for messages. */
-	extern SafeQueue messagesQueue;
+	extern CQueueSafe messagesQueue;
 }

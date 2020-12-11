@@ -1,61 +1,36 @@
-#include <string>
-#include <iostream>
-#include <time.h>
-#include <fstream>
+//
+
 #include "Util.h"
-#include <chrono>
-//#include <filesystem> // or #include <experimental/filesystem> // for creating directory in LogInit()
+#include "Engine.PCH.h"
+#include "FileSystem.h"
 
 #if defined(_WIN32) || defined(_WIN64)
 #include <Windows.h>
 #endif
 
-
-void SafeQueue::safePush(const Message & value)
-{
-	while (!m_mutex.try_lock())
-	{
-		SDL_Delay(1);
-	}
-
-	m_queque.push(value);
-	m_mutex.unlock();
-}
-
-void SafeQueue::safePop()
-{
-	while (!m_mutex.try_lock())
-	{
-		SDL_Delay(1);
-	}
-
-	m_queque.pop();
-	m_mutex.unlock();
-}
-
-namespace Util
+namespace FUtil
 {
 	bool isLoggingEnabled = false;
 	int loggingLevel = 1;
-	std::string logDir = "log";
-	std::string logPrefix = "log_";
-	std::string logFilePath = logDir + "/" + logPrefix + GetCurrentTimeNoSpecial();
+	std::string LogDir = "log";
+	std::string LogPrefix = "log_";
+	std::string LogFilePath = logDir + "/" + logPrefix + GetCurrentTimeNoSpecial();
 
 	bool keepLogging = true;
 	SDL_Thread *thread;
-	SafeQueue messagesQueue;
+	CQueueSafe messagesQueue;
 
-	void LogInit(bool enableLogging, int logLevel)
+	void LogInit(bool EnableLogging)
 	{
 		// @TODO - Create directory error if doesn't exist (Windows only)
 		// @TODO - Crossplatform
 
-		if (enableLogging)
+		if (EnableLogging)
 		{
 
 // Windows check if log folder exists
 #if defined(_WIN32) || defined(_WIN64)
-			CreateDirectory(logDir.c_str(), NULL);
+			FFilesystem::CreateDirrectory(LogDir);
 
 			//namespace fs = std::experimental::filesystem;
 			//if (!fs::is_directory(logDir) || !fs::exists(logDir)) // Check if folder exists
@@ -68,7 +43,7 @@ namespace Util
 // Linux
 #ifdef linux
 // TODO create dir on linux
-			Util::Warning("Creating directory on linux isn't implemented yet. Please create one or log will don't be created");
+			Util::Warn("Creating directory on linux isn't implemented yet. Please create one or log will don't be created");
 #endif
 			isLoggingEnabled = true;
 			std::cout << "Logging to: " << logFilePath << std::endl;
@@ -77,8 +52,6 @@ namespace Util
 		{
 			isLoggingEnabled = false;
 		}
-
-		loggingLevel = logLevel;
 
 		SDL_CreateThread(MessagesPrinter, "Log", (void *)NULL);
 	}
@@ -92,29 +65,31 @@ namespace Util
 			}
 			else
 			{
-				switch (messagesQueue.m_queque.front().type)
+				FLogMessage& Message = MessagesQueue.PeekLast();
+
+				switch (Message.Type)
 				{
-				case Message_Info:
-					PrintToConsole(messagesQueue.m_queque.front().text, 7);
+				case ELogMessageType::Message_Info:
+					PrintToConsole(Message.Text, 7);
 					break;
 
-				case Message_Debug:
+				case ELogMessageType::Message_Debug:
 #ifdef _DEBUG
-					PrintToConsole(messagesQueue.m_queque.front().text, 5);
+					PrintToConsole(Message.Text, 5);
 #endif // _DEBUG
 					break;
 
-				case Message_Warning:
-					PrintToConsole(messagesQueue.m_queque.front().text, 6);
+				case ELogMessageType::Message_Warning:
+					PrintToConsole(Message.Text, 6);
 					break;
 
-				case Message_Error:
-					PrintToConsole(messagesQueue.m_queque.front().text, 4);
+				case ELogMessageType::Message_Error:
+					PrintToConsole(Message.Text, 4);
 					break;
 
 				default:
 					// Should be impossible (infinite loop may happen)
-					
+					// @TODO Create type assert
 					break;
 				}
 
@@ -122,30 +97,30 @@ namespace Util
 				{
 					std::ofstream LogFile;
 					LogFile.open(logFilePath, std::ios_base::app);
-					LogFile << messagesQueue.m_queque.front().text << std::endl;
+					LogFile << Message.Text << std::endl;
 					LogFile.close();
 				}
 
 				// Remove item
-				messagesQueue.safePop();
+				MessagesQueue.PopSafe();
 			}
 
 		return 0;
 	}
 
 	/* Return current Milisecond */
-	inline long long int GetMiliseconds()
+	inline long long unsigned int GetMiliseconds()
 	{
 		return std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count();
 	}
 
 	/* Starts delay you need variable long long int and pass it as reference */
-	void startDelay(long long int &startMs)
+	void StartDelay(long long unsigned int &startMs)
 	{
 		startMs = GetMiliseconds();
 	}
 
-	bool isDelayed(long long int &startMs, long int &delayMs)
+	bool IsDelayed(long long unsigned int &startMs, long long unsigned int &delayMs)
 	{
 		if (GetMiliseconds() >= startMs + delayMs)
 			return true;
@@ -195,35 +170,35 @@ namespace Util
 
 	void Info(std::string message) 
 	{
-		message = GetCurrTime() + " (Info): " + message;
+		Message = GetCurrTime() + " (Info): " + Message;
 		
-		messagesQueue.safePush({ Message_Info , message });
+		messagesQueue.safePush({ Message_Info , Message });
 	}
 
 	void Debug(std::string message) 
 	{
 #ifdef _DEBUG // if debug
-		message = GetCurrTime() + " (Debug): " + message;
+		Message = GetCurrTime() + " (Debug): " + Message;
 
-		messagesQueue.safePush({ Message_Debug , message });
+		messagesQueue.safePush({ Message_Debug , Message });
 #endif
 	}
 
-	void Warning(std::string message) 
+	void Warning(std::string Message) 
 	{
-		message = GetCurrTime() + " (Warning): " + message;
+		Message = GetCurrTime() + " (Warning): " + Message;
 		
-		messagesQueue.safePush({ Message_Warning , message });
+		MessagesQueue.SafePush({ Message_Warning , Message });
 	}
 
-	void Error(std::string message) 
+	void Error(std::string Message) 
 	{
-		message = GetCurrTime() + " (Error): " + message;
+		Message = GetCurrTime() + " (Error): " + Message;
 		
-		messagesQueue.safePush({ Message_Error , message });
+		messagesQueue.safePush({ Message_Error , Message });
 	}
 
-	void PrintToConsole(std::string &message, int color)
+	void PrintToConsole(std::string &Message, int Color)
 	{
 #if defined(_WIN32) || defined(_WIN64)
 		// Change color to red
